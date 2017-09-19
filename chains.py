@@ -6,8 +6,7 @@ def jsonPP(string):
 
 class Ticker:
 	def refresh(self):
-		r = requests.get("https://api.coinmarketcap.com/v1/ticker").text
-		self.data = json.loads(r)
+		self.data = requests.get("https://api.coinmarketcap.com/v1/ticker").json()
 
 	def getPrice(self, sym):
 		price = 0
@@ -37,38 +36,32 @@ class Chain:
 
 	### different functions for each coin, delegated by __init__
 	def BTC_getTip(self):
-		r = requests.get("https://blockchain.info/latestblock").text
-		j = json.loads(r)
+		j = requests.get("https://blockchain.info/latestblock").json()
 		self.tipHeight = str(j["height"])
 		self.tipHash = str(j["hash"])
 		self.numTxs = str(len(j["txIndexes"]))
 
 	def XMR_getTip(self):
-		r = requests.get("https://xmrchain.net/api/transactions").text
-		j = json.loads(r)
+		j = requests.get("https://xmrchain.net/api/transactions").json()
 		self.tipHeight = str(j["data"]["blocks"][0]["height"])
 		self.tipHash = str(j["data"]["blocks"][0]["hash"])
 		self.numTxs = str(len(j["data"]["blocks"][0]["txs"]))
 
 	def ETH_getTip(self):
-		r = requests.get("https://etherchain.org/api/blocks/0/1").text
-		j = json.loads(r)
+		j = requests.get("https://etherchain.org/api/blocks/0/1").json()
 		self.tipHeight = str(j["data"][0]["number"])
 		self.tipHash = str(j["data"][0]["hash"])
 		self.numTxs = str(j["data"][0]["tx_count"])
 
 	def LTC_getTip(self):
-		r = requests.get("https://chain.so/api/v2/get_info/ltc").text
-		j = json.loads(r)
+		j = requests.get("https://chain.so/api/v2/get_info/ltc").json()
 		self.tipHeight = str(j["data"]["blocks"])
-		r = requests.get("https://chain.so/api/v2/get_block/ltc/" + self.tipHeight).text
-		j = json.loads(r)
+		j = requests.get("https://chain.so/api/v2/get_block/ltc/" + self.tipHeight).json()
 		self.tipHash = str(j["data"]["blockhash"])
 		self.numTxs = str(len(j["data"]["txs"]))
 
 	def DCR_getTip(self):
-		r = requests.get("https://mainnet.decred.org/api/blocks?limit=0").text
-		j = json.loads(r)
+		j = requests.get("https://mainnet.decred.org/api/blocks?limit=0").json()
 		self.tipHeight = str(j["blocks"][0]["height"])
 		self.tipHash = str(j["blocks"][0]["hash"])
 		self.numTxs = str(j["blocks"][0]["txlength"])
