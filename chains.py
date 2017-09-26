@@ -1,6 +1,7 @@
 import requests
 import json
 
+
 def jsonPP(string):
 	print json.dumps(json.loads(string), indent=4, sort_keys=True)
 
@@ -40,18 +41,30 @@ class Chain:
 		self.tipHeight = str(j["height"])
 		self.tipHash = str(j["hash"])
 		self.numTxs = str(len(j["txIndexes"]))
-
-	def XMR_getTip(self):
-		j = requests.get("https://xmrchain.net/api/transactions").json()
-		self.tipHeight = str(j["data"]["blocks"][0]["height"])
-		self.tipHash = str(j["data"]["blocks"][0]["hash"])
-		self.numTxs = str(len(j["data"]["blocks"][0]["txs"]))
+		
+	def BCH_getTip(self):
+		j = requests.get("https://api.blockchair.com/bitcoin-cash/blocks").json()
+		self.tipHeight = str(j["data"][0]["id"])
+		self.tipHash = str(j["data"][0]["hash"])
+		self.numTxs = str(j["data"][0]["transaction_count"])
 
 	def ETH_getTip(self):
 		j = requests.get("https://etherchain.org/api/blocks/0/1").json()
 		self.tipHeight = str(j["data"][0]["number"])
 		self.tipHash = str(j["data"][0]["hash"])
 		self.numTxs = str(j["data"][0]["tx_count"])
+		
+	def ETC_getTip(self):
+		j = requests.get("https://api.gastracker.io/blocks/latest").json()
+		self.tipHeight = str(j["items"][0]["height"])
+		self.tipHash = str(j["items"][0]["hash"])
+		self.numTxs = str(j["items"][0]["transactions"])		
+
+	def XMR_getTip(self):
+		j = requests.get("https://xmrchain.net/api/transactions").json()
+		self.tipHeight = str(j["data"]["blocks"][0]["height"])
+		self.tipHash = str(j["data"]["blocks"][0]["hash"])
+		self.numTxs = str(len(j["data"]["blocks"][0]["txs"]))
 
 	def LTC_getTip(self):
 		j = requests.get("https://chain.so/api/v2/get_info/ltc").json()
@@ -66,7 +79,7 @@ class Chain:
 		self.tipHash = str(j["blocks"][0]["hash"])
 		self.numTxs = str(j["blocks"][0]["txlength"])
 	
-x = [Chain("Bitcoin", "BTC"),Chain("Monero", "XMR"),Chain("Ethereum", "ETH"),Chain("Litecoin", "LTC"),Chain("Decred", "DCR")]	
+x = [Chain("Bitcoin", "BTC"),Chain("Bitcoin Cash", "BCH"),Chain("Ethereum", "ETH"),Chain("Ethereum Classic", "ETC"),Chain("Monero", "XMR"),Chain("Litecoin", "LTC"),Chain("Decred", "DCR")]	
 
 Ticker = Ticker()
 Ticker.refresh()
