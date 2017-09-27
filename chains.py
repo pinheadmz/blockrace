@@ -3,6 +3,8 @@ import json
 import time
 import sys
 import os
+import operator
+from multiprocessing.dummy import Pool as ThreadPool 
 
 # Constants
 IMG128_DIR = "/www/i/128/"
@@ -40,6 +42,7 @@ class Chain:
 		self.name = name
 		self.sym = sym
 		self.logo = IMG128_DIR + logo
+		self.price = 0
 		# store history of chain tips
 		self.history = [Tip(0,0,0)]
 		# delegate API function
@@ -47,22 +50,28 @@ class Chain:
 	
 	def refresh(self):
 		newTip = self.getTip()
+		if not newTip:
+			return False
 		oldTip = self.history[-1]
 		if newTip.height != oldTip.height:
+			# clear init tip
 			if oldTip.height == 0:
-				# clear init tip
-				self.history.pop(0)
+				self.history.pop(-1)
 			self.history.append(newTip)
-		if len(self.history) > MAX_BLOCK_HISTORY:
-			self.history.pop(0)
+			if len(self.history) > MAX_BLOCK_HISTORY:
+				self.history.pop(0)
+			return newTip
+		else:
+			return False
 
 	def display(self):
+		print('---')
 		print('Name:   ' + self.name)
 		print('Symbol: ' + self.sym)
-		print('Price:  ' + self.price)
+		print('Price:  ' + str(self.price))
 		print('History:')
 		for tip in self.history:
-			print '%-18.16s%-14.12s%-80.78s%-10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
+			print '%18.16s%14.12s%80.78s%10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
 
 	def getPrice(self):
 		self.price = Ticker.getPrice(self.sym)
@@ -77,7 +86,8 @@ class Chain:
 			tipNumTxs = str(len(j["txIndexes"]))
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print("Error:", sys.exc_info()[0])
+			print(self.name, "Error:", sys.exc_info())
+			return False
 		
 	def BCH_getTip(self):
 		try:
@@ -87,7 +97,8 @@ class Chain:
 			tipNumTxs = str(j["data"][0]["transaction_count"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print("Error:", sys.exc_info()[0])
+			print(self.name, "Error:", sys.exc_info())
+			return False
 
 	def ETH_getTip(self):
 		try:
@@ -97,7 +108,8 @@ class Chain:
 			tipNumTxs = str(j["data"][0]["tx_count"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print("Error:", sys.exc_info()[0])
+			print(self.name, "Error:", sys.exc_info())
+			return False
 		
 	def ETC_getTip(self):
 		try:
@@ -107,7 +119,8 @@ class Chain:
 			tipNumTxs = str(j["items"][0]["transactions"])	
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print("Error:", sys.exc_info()[0])	
+			print(self.name, "Error:", sys.exc_info())
+			return False
 
 	def XMR_getTip(self):
 		try:
@@ -117,7 +130,8 @@ class Chain:
 			tipNumTxs = str(len(j["data"]["blocks"][0]["txs"]))
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print("Error:", sys.exc_info()[0])
+			print(self.name, "Error:", sys.exc_info())
+			return False
 
 	def LTC_getTip(self):
 		try:
@@ -128,7 +142,8 @@ class Chain:
 			tipNumTxs = str(len(j["data"]["txs"]))
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print("Error:", sys.exc_info()[0])
+			print(self.name, "Error:", sys.exc_info())
+			return False
 
 	def DCR_getTip(self):
 		try:
@@ -138,7 +153,8 @@ class Chain:
 			tipNumTxs = str(j["blocks"][0]["txlength"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print("Error:", sys.exc_info()[0])
+			print(self.name, "Error:", sys.exc_info())
+			return False
 	
 x = [	Chain("Bitcoin",			"BTC",	"bitcoin.png"),
 		Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash.png"),
@@ -152,11 +168,12 @@ x = [	Chain("Bitcoin",			"BTC",	"bitcoin.png"),
 Ticker = Ticker()
 Ticker.refresh()
 
+pool = ThreadPool(8)
+
 while True:
+	a = pool.map(operator.methodcaller('refresh'), x)
+	b = pool.map(operator.methodcaller('getPrice'), x)
 	os.system('clear')
 	for i in x:
-		i.refresh()
-		i.getPrice()
 		i.display()
-		print "--"
 	time.sleep(3)
