@@ -8,7 +8,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 # Constants
 IMG128_DIR = "/www/i/128/"
-MAX_BLOCK_HISTORY = 60
+MAX_BLOCK_HISTORY = 4
 
 # Utility
 def jsonPP(string):
@@ -16,16 +16,22 @@ def jsonPP(string):
 
 # Object to refresh prices for all chains
 class Ticker:
+	def __init__(self):
+		self.data = []
+		
 	def refresh(self):
-		self.data = requests.get("https://api.coinmarketcap.com/v1/ticker").json()
+		try:
+			self.data = requests.get("https://api.coinmarketcap.com/v1/ticker").json()
+			return self.data
+		except:
+			print("Ticker Error:", sys.exc_info())
+			return False
 
 	def getPrice(self, sym):
-		price = 0
 		for c in self.data:
 			if c["symbol"] == sym:
-				price = c["price_usd"]
-				break
-		return price
+				return c["price_usd"]
+		return 0
 
 # Object to store details about blocks
 class Tip:
@@ -166,11 +172,11 @@ x = [	Chain("Bitcoin",			"BTC",	"bitcoin.png"),
 	]	
 
 Ticker = Ticker()
-Ticker.refresh()
 
 pool = ThreadPool(8)
 
 while True:
+	Ticker.refresh()
 	a = pool.map(operator.methodcaller('refresh'), x)
 	b = pool.map(operator.methodcaller('getPrice'), x)
 	os.system('clear')
