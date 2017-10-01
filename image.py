@@ -28,14 +28,14 @@ disp = TFT.ST7735(
 
 # Load an image.
 print('Loading image...')
-image1 = Image.open('/home/pi/blockrace/www/i/128/bitcoin.jpg')
-image2 = Image.open('/home/pi/blockrace/www/i/128/decred.jpg')
-image3 = Image.open('/home/pi/blockrace/www/i/128/monero.jpg')
+image1 = Image.open('/home/pi/blockrace/jpg128/bitcoin.jpg')
+image2 = Image.open('/home/pi/blockrace/jpg128/decred.jpg')
+image3 = Image.open('/home/pi/blockrace/jpg128/monero.jpg')
 
 
-image1 = PIL.ImageOps.invert(image1)
-image2 = PIL.ImageOps.invert(image2)
-image3 = PIL.ImageOps.invert(image3)
+#image1 = PIL.ImageOps.invert(image1)
+#image2 = PIL.ImageOps.invert(image2)
+#image3 = PIL.ImageOps.invert(image3)
 
 
 # Resize the image and rotate it so matches the display.
