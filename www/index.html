@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<head>
+	<title>BlockRace</title>
+	<style>
+		body{
+			position: relative;
+			border: 1px solid black;
+			height: 480px;
+			width: 800px;
+		}
+		
+		.panel{
+			border: 1px solid black;
+			border-radius: 10px;
+			margin: 2px;
+		}
+		
+		.activeBlocks{
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			height: 474px;
+			width: 120px;
+		}
+		
+		.blockSelect{
+			height: 114px;
+			width: 114px;
+			overflow: hidden;
+		}
+		
+		.blockSelect img, .blockOption img{
+			width: 100%;
+		}
+		
+		.selected{
+			opacity: 0.5;
+			background-color: grey;
+		}
+		
+		.chooser{
+			position: absolute;
+			top: 0px;
+			left: 124px;
+			height: 474px;
+			width: 670px;
+			overflow: hidden;
+			z-index: 10;
+			display: none;
+		}
+		
+		.blockOption{
+			display: inline-block;
+			height: 140px;
+			width: 100px;
+			overflow: hidden;
+		}
+		
+		.optionName{
+			text-transform: capitalize;
+			display: inline-block;
+			text-align: center;
+			width: 100%;
+		}
+
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+	<div class="panel activeBlocks">
+		<div class="blockSelect panel">
+		</div>
+		<div class="blockSelect panel">
+		</div>
+		<div class="blockSelect panel">
+		</div>
+		<div class="blockSelect panel">
+		</div>
+	</div>
+		<div class="panel chooser">
+		</div>
+</body>
+<script>
+	// fill block options
+	blocks = [	{name:	'bitcoin'},
+				{name:	'bitcoin-cash'},
+				{name:	'dash'},
+				{name:	'decred'},
+				{name:	'dogecoin'},
+				{name:	'ethereum-classic'},
+				{name:	'ethereum'},
+				{name:	'litecoin'},
+				{name:	'monero'},
+				{name:	'namecoin'},
+				{name:	'nem'},
+				{name:	'viacoin'},
+				{name:	'zcash'},
+			];
+	$(blocks).each(function(i,v){
+		var newOpt = `	<div class="blockOption panel" data-name=` + v.name + `>
+							<img src="i/128/` + v.name + `.png">
+							<br>
+							<span class="optionName">` + v.name + `</span>
+						</div>`;
+		$('.chooser').append(newOpt);
+	});
+	
+	// add functionality to buttons
+	$('.blockSelect').click(function(){
+		if(!$(this).hasClass('selected')){
+			$('.selected').removeClass('selected');
+			$(this).addClass('selected');
+			showChooser(true);
+		} else {
+			$('.selected').removeClass('selected');
+			showChooser(false);
+		}
+	});
+	
+	$('.blockOption').click(function(){
+		var name = $(this).data('name')
+		$('.selected').html("	<img src='i/128/" + name + ".png'>");
+		showChooser(false);
+		$('.selected').removeClass('selected');
+	});
+	
+	// change displays
+	function showChooser(show){
+		if (show)
+			$('.chooser').css('display', 'block')
+		else
+			$('.chooser').css('display', 'none')	
+	}
+</script>
+</html>
