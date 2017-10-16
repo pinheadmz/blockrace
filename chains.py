@@ -3,11 +3,8 @@ import json
 import time
 import sys
 import os
-import operator
-from multiprocessing.dummy import Pool as ThreadPool 
 
 # Constants
-IMG128_DIR = "/www/i/128/"
 MAX_BLOCK_HISTORY = 4
 
 # Utility
@@ -32,6 +29,7 @@ class Ticker:
 			if c["symbol"] == sym:
 				return c["price_usd"]
 		return 0
+Ticker = Ticker()
 
 # Object to store details about blocks
 class Tip:
@@ -47,7 +45,7 @@ class Chain:
 		# general details for chain
 		self.name = name
 		self.sym = sym
-		self.logo = IMG128_DIR + logo
+		self.logo = logo
 		self.price = 0
 		self.netstat = 0
 		# store history of chain tips
@@ -165,25 +163,3 @@ class Chain:
 		except:
 			print(self.name, "Error:", sys.exc_info())
 			return False
-	
-x = [	Chain("Bitcoin",			"BTC",	"bitcoin.png"),
-		Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash.png"),
-		Chain("Ethereum",			"ETH",	"ethereum.png"),
-		Chain("Ethereum Classic",	"ETC",	"ethereum-classic.png"),
-		Chain("Monero",				"XMR",	"monero.png"),
-		Chain("Litecoin",			"LTC",	"litecoin.png"),
-		Chain("Decred",				"DCR",	"decred.png")
-	]	
-
-Ticker = Ticker()
-
-pool = ThreadPool(8)
-
-while True:
-	Ticker.refresh()
-	a = pool.map(operator.methodcaller('refresh'), x)
-	b = pool.map(operator.methodcaller('getPrice'), x)
-	os.system('clear')
-	for i in x:
-		i.display()
-	time.sleep(3)

@@ -2,7 +2,23 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
 from os import curdir, sep
 import json
+import operator
+from multiprocessing.dummy import Pool as ThreadPool 
+import thread
+from chains import *
 
+# CONSTANTS
+index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin.png"),
+			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash.png"),
+			"ETH":	Chain("Ethereum",			"ETH",	"ethereum.png"),
+			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic.png"),
+			"XMR":	Chain("Monero",				"XMR",	"monero.png"),
+			"LTC":	Chain("Litecoin",			"LTC",	"litecoin.png"),
+			"DCR":	Chain("Decred",				"DCR",	"decred.png")
+		}	
+chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
+
+# WEB SERVER
 class HTTPHandler(BaseHTTPRequestHandler):
 	def _set_headers(self):
 		self.send_response(200)
@@ -13,8 +29,24 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		self._set_headers()
 
 	def do_GET(self):
+		# DYNAMIC js file
+		if self.path == "/chainsIndex.js":
+			chainsIndex = []
+			for chain in chains:
+				chainObj = {}
+				chainObj["name"] = chain.name
+				chainObj["sym"] = chain.sym
+				chainObj["logo"] = chain.logo
+				chainsIndex.append(chainObj)
+			jsString = "chains="+json.dumps(chainsIndex)
+			self.send_response(200)
+			self.send_header('Content-type','application/javascript')
+			self.end_headers()
+			self.wfile.write(jsString)
+			return
+	
 		if self.path == "/":
-			self.path = "index.html"		
+			self.path = "index.html"
 		try:
 			#Check the file extension required and set the right mime type
 			sendReply = False
@@ -55,14 +87,30 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		self._set_headers()
 		self.data_string = self.rfile.read(int(self.headers['Content-Length']))
 		data = json.loads(self.data_string)
-		print(self.data_string)
-		self.wfile.write(json.dumps({"coin":str(data['name']),"price":5000}))
+		chosenChain = index[data['sym']]
+		self.wfile.write(json.dumps({	"name": chosenChain.name,
+										"price": chosenChain.price,
+										"height": chosenChain.getTip().height,
+										"hash": chosenChain.getTip().hash
+									}))
 		return
 
-def run(server_class=HTTPServer, handler_class=HTTPHandler, port=8080):
+def startServer(server_class=HTTPServer, handler_class=HTTPHandler, port=8080):
 	server_address = ('', port)
 	httpd = server_class(server_address, handler_class)
 	print 'Starting httpd...'
 	httpd.serve_forever()
 
-run()
+# start the web server in a background thread
+thread.start_new_thread(startServer, ())
+
+# START API SCRAPER
+pool = ThreadPool(8)
+while True:
+	Ticker.refresh()
+	a = pool.map(operator.methodcaller('refresh'), chains)
+	b = pool.map(operator.methodcaller('getPrice'), chains)
+	os.system('clear')
+	for i in chains:
+		i.display()
+	time.sleep(3)

@@ -12,21 +12,22 @@
 		.panel{
 			border: 1px solid black;
 			border-radius: 10px;
-			margin: 2px;
+			margin: 1px;
 		}
 		
 		.activeChains{
 			position: absolute;
 			top: 0px;
 			left: 0px;
-			height: 474px;
-			width: 120px;
+			height: 476px;
+			width: 796px;
 		}
 		
 		.chainSelect{
-			height: 114px;
-			width: 114px;
+			height: 115px;
+			width: 115px;
 			overflow: hidden;
+			float: left;
 		}
 		
 		.chainSelect img, .chainOption img{
@@ -38,6 +39,13 @@
 			background-color: grey;
 		}
 		
+		.chainInfo{
+			height: 115px;
+			width: 664px;
+			overflow: hidden;
+			float: right;
+		}
+		
 		.chooser{
 			position: absolute;
 			top: 0px;
@@ -47,6 +55,7 @@
 			overflow: hidden;
 			z-index: 10;
 			display: none;
+			background-color: white;
 		}
 		
 		.chainOption{
@@ -68,48 +77,31 @@
 </head>
 <body>
 	<div class="panel activeChains">
-		<div class="chainSelect panel" data-track="1">
-		</div>
-		<div class="chainSelect panel" data-track="2">
-		</div>
-		<div class="chainSelect panel" data-track="3">
-		</div>
-		<div class="chainSelect panel" data-track="4">
-		</div>
+		<div class="chainSelect panel" data-track="1"></div>
+		<div class="chainInfo panel" data-track="1"></div>
+		<div class="chainSelect panel" data-track="2"></div>
+		<div class="chainInfo panel" data-track="2"></div>
+		<div class="chainSelect panel" data-track="3"></div>
+		<div class="chainInfo panel" data-track="3"></div>
+		<div class="chainSelect panel" data-track="4"></div>
+		<div class="chainInfo panel" data-track="4"></div>
 	</div>
 		<div class="panel chooser">
 		</div>
 </body>
+<script src="chainsIndex.js"></script>
 <script>
-	// ***
-	// GET DETAILS & BUILD UI
-	// ***
-	chains = [	{name:	'bitcoin'},
-				{name:	'bitcoin-cash'},
-				{name:	'dash'},
-				{name:	'decred'},
-				{name:	'dogecoin'},
-				{name:	'ethereum-classic'},
-				{name:	'ethereum'},
-				{name:	'litecoin'},
-				{name:	'monero'},
-				{name:	'namecoin'},
-				{name:	'nem'},
-				{name:	'viacoin'},
-				{name:	'zcash'},
-			];
+	// BUILD UI
 	$(chains).each(function(i,v){
-		var newOpt = `	<div class="chainOption panel" data-name=` + v.name + `>
-							<img src="i/128/` + v.name + `.png">
+		var newOpt = `	<div class="chainOption panel" data-name=` + v.name + ` data-sym=` + v.sym + ` data-logo=` + v.logo + `>
+							<img src="i/128/` + v.logo + `">
 							<br>
 							<span class="optionName">` + v.name + `</span>
 						</div>`;
 		$('.chooser').append(newOpt);
 	});
 	
-	// ***
 	// UI FUNCTIONALITY
-	// ***
 	// choose a track on which to select a chain
 	$('.chainSelect').click(function(){
 		if(!$(this).hasClass('selected')){
@@ -125,7 +117,9 @@
 	// select a chain for the chosen track
 	$('.chainOption').click(function(){
 		var name = $(this).data('name')
-		$('.selected').html("	<img src='i/128/" + name + ".png'>");
+		var sym = $(this).data('sym')
+		var logo = $(this).data('logo')
+		$('.selected').html("	<img src='i/128/" + logo + "'>");
 		showChooser(false);
 		var track = $('.selected').data('track');
 		$('.selected').removeClass('selected');
@@ -134,7 +128,7 @@
 			url: "/",
 			type: "POST",
 			dataType: "json",
-			data: JSON.stringify({track: track, name: name}),
+			data: JSON.stringify({track: track, sym: sym}),
 			success: function(ret){console.log(ret);}
 		});
 	});
