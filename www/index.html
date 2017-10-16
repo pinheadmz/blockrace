@@ -91,7 +91,7 @@
 </body>
 <script src="chainsIndex.js"></script>
 <script>
-	// BUILD UI
+	// BUILD UI COIN CHOOSER
 	$(chains).each(function(i,v){
 		var newOpt = `	<div class="chainOption panel" data-name=` + v.name + ` data-sym=` + v.sym + ` data-logo=` + v.logo + `>
 							<img src="i/128/` + v.logo + `">
@@ -129,17 +129,23 @@
 			type: "POST",
 			dataType: "json",
 			data: JSON.stringify({track: track, sym: sym}),
-			success: function(ret){console.log(ret);}
+			success: function(ret){updateTrackInfo(track, ret);}
 		});
 	});
-	
-	
+
+	// FUNCTIONALITY
 	// reveal chain chooser menu
 	function showChooser(show){
 		if (show)
 			$('.chooser').css('display', 'block')
 		else
 			$('.chooser').css('display', 'none')	
+	}
+	
+	// display network info on chain track
+	function updateTrackInfo(track, data){
+	
+	
 	}
 </script>
 </html>

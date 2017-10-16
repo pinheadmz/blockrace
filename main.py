@@ -90,8 +90,8 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		chosenChain = index[data['sym']]
 		self.wfile.write(json.dumps({	"name": chosenChain.name,
 										"price": chosenChain.price,
-										"height": chosenChain.getTip().height,
-										"hash": chosenChain.getTip().hash
+										"height": chosenChain.history[-1].height,
+										"hash": chosenChain.history[-1].hash
 									}))
 		return
 
