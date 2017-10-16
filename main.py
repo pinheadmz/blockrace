@@ -54,9 +54,9 @@ class HTTPHandler(BaseHTTPRequestHandler):
 	def do_POST(self):
 		self._set_headers()
 		self.data_string = self.rfile.read(int(self.headers['Content-Length']))
-		#data = json.loads(self.data_string)
+		data = json.loads(self.data_string)
 		print(self.data_string)
-		#self.wfile.write("Track: " + data["track"] + " = " + data["name"])
+		self.wfile.write(json.dumps({"coin":str(data['name']),"price":5000}))
 		return
 
 def run(server_class=HTTPServer, handler_class=HTTPHandler, port=8080):

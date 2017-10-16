@@ -130,7 +130,13 @@
 		var track = $('.selected').data('track');
 		$('.selected').removeClass('selected');
 		// send command to server to update hardware
-		$.post("/", {track: track, name: name}, function(data){console.log(data);});
+		$.ajax({
+			url: "/",
+			type: "POST",
+			dataType: "json",
+			data: JSON.stringify({track: track, name: name}),
+			success: function(ret){console.log(ret);}
+		});
 	});
 	
 	
