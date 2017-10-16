@@ -49,6 +49,7 @@ class Chain:
 		self.sym = sym
 		self.logo = IMG128_DIR + logo
 		self.price = 0
+		self.netstat = 0
 		# store history of chain tips
 		self.history = [Tip(0,0,0)]
 		# delegate API function
@@ -57,7 +58,9 @@ class Chain:
 	def refresh(self):
 		newTip = self.getTip()
 		if not newTip:
+			self.netstat += 1
 			return False
+		self.netstat = 0
 		oldTip = self.history[-1]
 		if newTip.height != oldTip.height:
 			# clear init tip
@@ -72,10 +75,11 @@ class Chain:
 
 	def display(self):
 		print('---')
-		print('Name:   ' + self.name)
-		print('Symbol: ' + self.sym)
-		print('Price:  ' + str(self.price))
-		print('History:')
+		print('Name:    ' + self.name)
+		print('Symbol:  ' + self.sym)
+		print('Price:   ' + str(self.price))
+		print('Netstat: ' + ("*" * self.netstat))
+		print('History: ')
 		for tip in self.history:
 			print '%18.16s%14.12s%80.78s%10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
 
