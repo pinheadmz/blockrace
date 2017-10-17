@@ -44,6 +44,9 @@
 			width: 664px;
 			overflow: hidden;
 			float: right;
+			text-align: center;
+			font-family: monospace;
+			font-size: 15px;
 		}
 		
 		.chooser{
@@ -120,6 +123,7 @@
 		var sym = $(this).data('sym')
 		var logo = $(this).data('logo')
 		$('.selected').html("	<img src='i/128/" + logo + "'>");
+		$('.selected').data('sym', sym);
 		showChooser(false);
 		var track = $('.selected').data('track');
 		$('.selected').removeClass('selected');
@@ -144,8 +148,28 @@
 	
 	// display network info on chain track
 	function updateTrackInfo(track, data){
-	
-	
+		$('.chainInfo[data-track=' + track + ']').html(	'<br>' + data['name'] + '<br>' +
+														'Price:  $' + data['price'] + '<br>' +
+														'Height: ' + data['height'] + '<br>' +
+														'Hash:   ' + data['hash']);	
 	}
+	function getChainInfoAndUpdateDisplay(track, sym){
+		$.ajax({
+			url: "/",
+			type: "POST",
+			dataType: "json",
+			data: JSON.stringify({track: track, sym: sym}),
+			success: function(ret){updateTrackInfo(track, ret);}
+		});
+	}
+	
+	// MAIN LOOP
+	setInterval(function(){
+		$('.chainSelect').each(function(i,v){
+			if ($(v).data('sym')){
+				getChainInfoAndUpdateDisplay($(v).data('track'), $(v).data('sym'))
+			}
+		});	
+	},3000);
 </script>
 </html>
