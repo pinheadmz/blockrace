@@ -27,7 +27,7 @@ class Ticker:
 	def getPrice(self, sym):
 		for c in self.data:
 			if c["symbol"] == sym:
-				return c["price_usd"]
+				return (c["price_usd"], c["percent_change_1h"], c["percent_change_24h"])
 		return 0
 Ticker = Ticker()
 
@@ -47,6 +47,8 @@ class Chain:
 		self.sym = sym
 		self.logo = logo
 		self.price = 0
+		self.hourPriceChange = 0
+		self.dayPriceChange = 0
 		self.netstat = 0
 		# store history of chain tips
 		self.history = [Tip(0,0,0)]
@@ -82,7 +84,7 @@ class Chain:
 			print '%18.16s%14.12s%80.78s%10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
 
 	def getPrice(self):
-		self.price = Ticker.getPrice(self.sym)
+		(self.price, self.hourPriceChange, self.dayPriceChange) = Ticker.getPrice(self.sym)
 		return self.price
 
 	### different functions for each coin, delegated by __init__

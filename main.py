@@ -109,6 +109,8 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		# respond to browser
 		self.wfile.write(json.dumps({	"name": chosenChain.name,
 										"price": chosenChain.price,
+										"hourPriceChange": chosenChain.hourPriceChange,
+										"dayPriceChange": chosenChain.dayPriceChange,
 										"height": chosenChain.history[-1].height,
 										"numTxs": chosenChain.history[-1].numTxs,
 										"time": chosenChain.history[-1].time,

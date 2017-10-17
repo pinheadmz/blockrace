@@ -180,10 +180,15 @@
 			stat = "<span style='color:red'>Bad</span>";
 		else if (data['netstat'] >= 12)
 			stat = "<span style='color:brown'>Broken</span>";
+			
+		if (data['dayPriceChange'] > 0)
+			gain = "<span style='color:green'> (+"
+		else
+			gain = "<span style='color:red'> ("
 
 
 		$('.chainInfo[data-track=' + track + ']').html(	'<br><span class="chainName">' + data['name'] + '</span><br>' +
-														'<span class="chainPrice">Price: ' + money.format(data['price']) + '</span><br>' +
+														'<span class="chainPrice">Price: ' + money.format(data['price']) + gain + data['dayPriceChange'] +'%)</span></span><br>' +
 														'<table class="infoTable"><tr><td>Latest block: ' + data['height'] + '</td>' +
 																					'<td>' + minsAgo + ' Min, ' + secsAgo + ' Sec ago</td>' +
 																					'<td># Txs: ' + data['numTxs'] + '</td>' +
