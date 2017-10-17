@@ -5,18 +5,28 @@ import json
 import operator
 from multiprocessing.dummy import Pool as ThreadPool 
 import thread
+import atexit
+
 from chains import *
+from screens import *
 
 # CONSTANTS
-index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin.png"),
-			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash.png"),
-			"ETH":	Chain("Ethereum",			"ETH",	"ethereum.png"),
-			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic.png"),
-			"XMR":	Chain("Monero",				"XMR",	"monero.png"),
-			"LTC":	Chain("Litecoin",			"LTC",	"litecoin.png"),
-			"DCR":	Chain("Decred",				"DCR",	"decred.png")
+index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin"),
+			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash"),
+			"ETH":	Chain("Ethereum",			"ETH",	"ethereum"),
+			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic"),
+			"XMR":	Chain("Monero",				"XMR",	"monero"),
+			"LTC":	Chain("Litecoin",			"LTC",	"litecoin"),
+			"DCR":	Chain("Decred",				"DCR",	"decred")
 		}	
 chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
+screens = Screens()
+
+# cleanup at shutdown
+def cleanup():
+	# clear screens
+	screens.clearAll()
+atexit.register(cleanup)
 
 # WEB SERVER
 class HTTPHandler(BaseHTTPRequestHandler):
@@ -88,6 +98,9 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		self.data_string = self.rfile.read(int(self.headers['Content-Length']))
 		data = json.loads(self.data_string)
 		chosenChain = index[data['sym']]
+		# push logo to screen
+		screens.showLogo(data['track'], chosenChain.logo)
+		# respond to browser
 		self.wfile.write(json.dumps({	"name": chosenChain.name,
 										"price": chosenChain.price,
 										"height": chosenChain.history[-1].height,
@@ -110,7 +123,7 @@ while True:
 	Ticker.refresh()
 	a = pool.map(operator.methodcaller('refresh'), chains)
 	b = pool.map(operator.methodcaller('getPrice'), chains)
-	os.system('clear')
+	#os.system('clear')
 	for i in chains:
 		i.display()
 	time.sleep(3)

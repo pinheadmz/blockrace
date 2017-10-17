@@ -98,7 +98,7 @@
 	// BUILD UI COIN CHOOSER
 	$(chains).each(function(i,v){
 		var newOpt = `	<div class="chainOption panel" data-name=` + v.name + ` data-sym=` + v.sym + ` data-logo=` + v.logo + `>
-							<img src="i/128/` + v.logo + `">
+							<img src="i/128/` + v.logo + `.png">
 							<br>
 							<span class="optionName">` + v.name + `</span>
 						</div>`;
@@ -123,7 +123,7 @@
 		var name = $(this).data('name')
 		var sym = $(this).data('sym')
 		var logo = $(this).data('logo')
-		$('.selected').html("	<img src='i/128/" + logo + "'>");
+		$('.selected').html("	<img src='i/128/" + logo + ".png'>");
 		$('.selected').data('sym', sym);
 		showChooser(false);
 		var track = $('.selected').data('track');
