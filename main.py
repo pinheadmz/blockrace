@@ -102,21 +102,28 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		self._set_headers()
 		self.data_string = self.rfile.read(int(self.headers['Content-Length']))
 		data = json.loads(self.data_string)
-		chosenChain = index[data['sym']]
-		# push logo to screen
-		if SCREENS_CONNECTED:
-			screens.showLogo(data['track'], chosenChain.logo)
-		# respond to browser
-		self.wfile.write(json.dumps({	"name": chosenChain.name,
-										"price": chosenChain.price,
-										"hourPriceChange": chosenChain.hourPriceChange,
-										"dayPriceChange": chosenChain.dayPriceChange,
-										"height": chosenChain.history[-1].height,
-										"numTxs": chosenChain.history[-1].numTxs,
-										"time": chosenChain.history[-1].time,
-										"hash": chosenChain.history[-1].hash,
-										"netstat": chosenChain.netstat
-									}))
+		
+		if self.path == "/getChainInfo":
+			chosenChain = index[data['sym']]
+			# push logo to screen
+			if SCREENS_CONNECTED:
+				screens.showLogo(data['track'], chosenChain.logo)
+			# respond to browser
+			self.wfile.write(json.dumps({	"name": chosenChain.name,
+											"price": chosenChain.price,
+											"hourPriceChange": chosenChain.hourPriceChange,
+											"dayPriceChange": chosenChain.dayPriceChange,
+											"height": chosenChain.history[-1].height,
+											"numTxs": chosenChain.history[-1].numTxs,
+											"time": chosenChain.history[-1].time,
+											"hash": chosenChain.history[-1].hash,
+											"netstat": chosenChain.netstat
+										}))
+		
+		if self.path == "/setVis":
+			# TODO
+			print(json.dumps(data))
+			self.wfile.write(json.dumps(data))
 		return
 
 def startServer(server_class=HTTPServer, handler_class=HTTPHandler, port=8080):

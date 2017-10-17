@@ -95,6 +95,27 @@
 		.infoTable td{
 			border: 1px solid black;
 		}
+		
+		.chooseVis{
+			width: 100%;
+			height: 100%;
+		}
+		
+		.visChoice{
+			height: 100%;
+			width: 33%;
+			border-left: 1px solid black;
+			background-color: lightGray;
+			display: inline-block;
+			font-family: sans-serif;
+		}
+		
+		.visChoice span{
+			top: 33%;
+		    position: relative;
+		    font-family: sans-serif;
+		    font-size: 20px;
+		}
 
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -102,16 +123,16 @@
 <body>
 	<div class="panel activeChains">
 		<div class="chainSelect panel" data-track="1"></div>
-		<div class="chainInfo panel" data-track="1"></div>
+		<div class="chainInfo panel" data-track="1"><div class="infoContainer"></div></div>
 		<div class="chainSelect panel" data-track="2"></div>
-		<div class="chainInfo panel" data-track="2"></div>
+		<div class="chainInfo panel" data-track="2"><div class="infoContainer"></div></div>
 		<div class="chainSelect panel" data-track="3"></div>
-		<div class="chainInfo panel" data-track="3"></div>
+		<div class="chainInfo panel" data-track="3"><div class="infoContainer"></div></div>
 		<div class="chainSelect panel" data-track="4"></div>
-		<div class="chainInfo panel" data-track="4"></div>
+		<div class="chainInfo panel" data-track="4"><div class="infoContainer"></div></div>
 	</div>
-		<div class="panel chooser">
-		</div>
+	<div class="panel chooser">
+	</div>
 </body>
 <script src="chainsIndex.js"></script>
 <script>
@@ -150,7 +171,7 @@
 		$('.selected').removeClass('selected');
 		// send command to server to update hardware
 		$.ajax({
-			url: "/",
+			url: "getChainInfo",
 			type: "POST",
 			dataType: "json",
 			data: JSON.stringify({track: track, sym: sym}),
@@ -158,6 +179,32 @@
 		});
 	});
 
+	// reveal LED strip visualizer menu for a track
+	$('.chainInfo').click( function(){
+		$(this).children('.infoContainer').css('display','none');
+		$(this).append(	'<div class="chooseVis">' +
+						'<div class="visChoice" data-vis="blocks"><span>Blocks</span></div>' +
+						'<div class="visChoice" data-vis="price"><span>Price</span></div>' +
+						'<div class="visChoice" data-vis="txs"><span>Txs</span></div>' +
+						'</div>');	
+	});
+	// choose LED strip visualizer for track
+	$('.chainInfo').on('click', '.visChoice', function(e){
+		e.stopPropagation();
+		var visChoice = $(this).data('vis');
+		var track = $(this).parent().parent().data('track');
+		$(this).parent().siblings('.infoContainer').css('display','block');
+		$(this).parent().remove();
+		// send command to server
+		$.ajax({
+			url: "setVis",
+			type: "POST",
+			dataType: "json",
+			data: JSON.stringify({track: track, visChoice: visChoice}),
+			success: function(ret){console.log(ret);}
+		});
+	});
+	
 	// FUNCTIONALITY
 	// reveal chain chooser menu
 	function showChooser(show){
@@ -186,24 +233,27 @@
 		else
 			gain = "<span style='color:red'> ("
 
-
-		$('.chainInfo[data-track=' + track + ']').html(	'<br><span class="chainName">' + data['name'] + '</span><br>' +
-														'<span class="chainPrice">Price: ' + money.format(data['price']) + gain + data['dayPriceChange'] +'%)</span></span><br>' +
-														'<table class="infoTable"><tr><td>Latest block: ' + data['height'] + '</td>' +
-																					'<td>' + minsAgo + ' Min, ' + secsAgo + ' Sec ago</td>' +
-																					'<td># Txs: ' + data['numTxs'] + '</td>' +
-																					'<td>API Status: ' + stat + '</td></tr>' +
-																				'<tr><td colspan="4">Hash: ' + data['hash'] + '</td></tr></table>');
+		$('.chainInfo[data-track=' + track + '] .infoContainer').html(	'<br>' +
+																		'<span class="chainName">' + data['name'] + '</span><br>' +
+																		'<span class="chainPrice">Price: ' + money.format(data['price']) + gain + data['dayPriceChange'] +'%)</span></span><br>' +
+																		'<table class="infoTable"><tr>' +
+																		'<td>Latest block: ' + data['height'] + '</td>' +
+																		'<td>' + minsAgo + ' Min, ' + secsAgo + ' Sec ago</td>' +
+																		'<td># Txs: ' + data['numTxs'] + '</td>' +
+																		'<td>API Status: ' + stat + '</td></tr>' +
+																		'<tr><td colspan="4">Hash: ' + data['hash'] + '</td></tr></table>');
 	}
+
 	function getChainInfoAndUpdateDisplay(track, sym){
 		$.ajax({
-			url: "/",
+			url: "getChainInfo",
 			type: "POST",
 			dataType: "json",
 			data: JSON.stringify({track: track, sym: sym}),
 			success: function(ret){updateTrackInfo(track, ret);}
 		});
 	}
+
 	var money = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
