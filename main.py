@@ -8,7 +8,10 @@ import thread
 import atexit
 
 from chains import *
-from screens import *
+
+SCREENS_CONNECTED = False
+if SCREENS_CONNECTED:
+	from screens import *
 
 # CONSTANTS
 index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin"),
@@ -20,12 +23,14 @@ index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin"),
 			"DCR":	Chain("Decred",				"DCR",	"decred")
 		}	
 chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
-screens = Screens()
+if SCREENS_CONNECTED:
+	screens = Screens()
 
 # cleanup at shutdown
 def cleanup():
 	# clear screens
-	screens.clearAll()
+	if SCREENS_CONNECTED:
+		screens.clearAll()
 atexit.register(cleanup)
 
 # WEB SERVER
@@ -99,12 +104,16 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		data = json.loads(self.data_string)
 		chosenChain = index[data['sym']]
 		# push logo to screen
-		screens.showLogo(data['track'], chosenChain.logo)
+		if SCREENS_CONNECTED:
+			screens.showLogo(data['track'], chosenChain.logo)
 		# respond to browser
 		self.wfile.write(json.dumps({	"name": chosenChain.name,
 										"price": chosenChain.price,
 										"height": chosenChain.history[-1].height,
-										"hash": chosenChain.history[-1].hash
+										"numTxs": chosenChain.history[-1].numTxs,
+										"time": chosenChain.history[-1].time,
+										"hash": chosenChain.history[-1].hash,
+										"netstat": chosenChain.netstat
 									}))
 		return
 
@@ -123,7 +132,7 @@ while True:
 	Ticker.refresh()
 	a = pool.map(operator.methodcaller('refresh'), chains)
 	b = pool.map(operator.methodcaller('getPrice'), chains)
-	#os.system('clear')
+	os.system('clear')
 	for i in chains:
 		i.display()
 	time.sleep(3)

@@ -75,6 +75,26 @@
 			text-align: center;
 			width: 100%;
 		}
+		
+		.chainName{
+			font-size: 20px;
+			font-family: sans-serif;
+			text-decoration: underline;
+		}
+		
+		.chainPrice{
+			font-size: 18px;
+			font-family: sans-serif;
+		}
+		
+		.infoTable{
+			margin: 0 auto;
+			border-collapse: collapse;
+		}
+		
+		.infoTable td{
+			border: 1px solid black;
+		}
 
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -149,10 +169,26 @@
 	
 	// display network info on chain track
 	function updateTrackInfo(track, data){
-		$('.chainInfo[data-track=' + track + ']').html(	'<br>' + data['name'] + '<br>' +
-														'Price:  $' + data['price'] + '<br>' +
-														'Height: ' + data['height'] + '<br>' +
-														'Hash:   ' + data['hash']);	
+		timeAgo = Math.floor(Date.now() / 1000) - data['time'];
+		minsAgo = Math.floor(timeAgo/60);
+		secsAgo = timeAgo%60;
+		if (data['netstat'] < 4)
+			stat = "<span style='color:green'>Good</span>";
+		else if (data['netstat'] < 8)
+			stat = "<span style='color:orange'>Ok</span>";
+		else if (data['netstat'] < 12)
+			stat = "<span style='color:red'>Bad</span>";
+		else if (data['netstat'] >= 12)
+			stat = "<span style='color:brown'>Broken</span>";
+
+
+		$('.chainInfo[data-track=' + track + ']').html(	'<br><span class="chainName">' + data['name'] + '</span><br>' +
+														'<span class="chainPrice">Price: ' + money.format(data['price']) + '</span><br>' +
+														'<table class="infoTable"><tr><td>Latest block: ' + data['height'] + '</td>' +
+																					'<td>' + minsAgo + ' Min, ' + secsAgo + ' Sec ago</td>' +
+																					'<td># Txs: ' + data['numTxs'] + '</td>' +
+																					'<td>API Status: ' + stat + '</td></tr>' +
+																				'<tr><td colspan="4">Hash: ' + data['hash'] + '</td></tr></table>');
 	}
 	function getChainInfoAndUpdateDisplay(track, sym){
 		$.ajax({
@@ -163,6 +199,11 @@
 			success: function(ret){updateTrackInfo(track, ret);}
 		});
 	}
+	var money = new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
+		minimumFractionDigits: 2
+	});
 	
 	// MAIN LOOP
 	setInterval(function(){
