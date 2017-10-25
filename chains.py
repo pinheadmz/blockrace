@@ -15,7 +15,7 @@ def jsonPP(string):
 class Ticker:
 	def __init__(self):
 		self.data = []
-		
+
 	def refresh(self):
 		try:
 			self.data = requests.get("https://api.coinmarketcap.com/v1/ticker").json()
@@ -54,7 +54,7 @@ class Chain:
 		self.history = [Tip(0,0,0)]
 		# delegate API function
 		self.getTip = getattr(self, sym + "_getTip")
-	
+
 	def refresh(self):
 		newTip = self.getTip()
 		if not newTip:
@@ -81,7 +81,7 @@ class Chain:
 		print('Netstat: ' + ("*" * self.netstat))
 		print('History: ')
 		for tip in self.history:
-			print '%18.16s%14.12s%80.78s%10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
+			print '%10.9s%8.7s%70.60s%10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
 
 	def getPrice(self):
 		(self.price, self.hourPriceChange, self.dayPriceChange) = Ticker.getPrice(self.sym)
@@ -98,7 +98,7 @@ class Chain:
 		except:
 			print(self.name, "Error:", sys.exc_info())
 			return False
-		
+
 	def BCH_getTip(self):
 		try:
 			j = requests.get("https://api.blockchair.com/bitcoin-cash/blocks").json()

@@ -9,7 +9,7 @@ import atexit
 
 from chains import *
 
-SCREENS_CONNECTED = False
+SCREENS_CONNECTED = True
 if SCREENS_CONNECTED:
 	from screens import *
 
@@ -21,7 +21,7 @@ index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin"),
 			"XMR":	Chain("Monero",				"XMR",	"monero"),
 			"LTC":	Chain("Litecoin",			"LTC",	"litecoin"),
 			"DCR":	Chain("Decred",				"DCR",	"decred")
-		}	
+		}
 chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
 if SCREENS_CONNECTED:
 	screens = Screens()
@@ -59,7 +59,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 			self.end_headers()
 			self.wfile.write(jsString)
 			return
-	
+
 		if self.path == "/":
 			self.path = "index.html"
 		try:
@@ -102,7 +102,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		self._set_headers()
 		self.data_string = self.rfile.read(int(self.headers['Content-Length']))
 		data = json.loads(self.data_string)
-		
+
 		if self.path == "/getChainInfo":
 			chosenChain = index[data['sym']]
 			# push logo to screen
@@ -119,7 +119,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 											"hash": chosenChain.history[-1].hash,
 											"netstat": chosenChain.netstat
 										}))
-		
+
 		if self.path == "/setVis":
 			# TODO
 			print(json.dumps(data))

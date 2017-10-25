@@ -31,7 +31,7 @@ class Screens():
 	def showLogo(self, s, logo):
 		image = Image.open(IMG_DIR + logo + '.jpg')
 		image = PIL.ImageOps.invert(image)
-		image = image.rotate(180)
+		#image = image.rotate(0)
 		self.selectScreen(s)
 		self.disp.clear()
 		self.disp.display(image)
