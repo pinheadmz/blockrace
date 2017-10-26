@@ -41,11 +41,12 @@ class Tip:
 
 # Object for each chain
 class Chain:
-	def __init__(self, name, sym, logo):
+	def __init__(self, name, sym, logo, color):
 		# general details for chain
 		self.name = name
 		self.sym = sym
 		self.logo = logo
+		self.color = color
 		self.price = 0
 		self.hourPriceChange = 0
 		self.dayPriceChange = 0

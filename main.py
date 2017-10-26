@@ -3,34 +3,42 @@ import SocketServer
 from os import curdir, sep
 import json
 import operator
-from multiprocessing.dummy import Pool as ThreadPool 
+from multiprocessing.dummy import Pool as ThreadPool
 import thread
 import atexit
 
 from chains import *
 
-SCREENS_CONNECTED = True
-if SCREENS_CONNECTED:
+SCREENS_ON = True
+STRIPS_ON = True
+if SCREENS_ON:
 	from screens import *
+if STRIPS_ON:
+	from strips import *
 
 # CONSTANTS
-index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin"),
-			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash"),
-			"ETH":	Chain("Ethereum",			"ETH",	"ethereum"),
-			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic"),
-			"XMR":	Chain("Monero",				"XMR",	"monero"),
-			"LTC":	Chain("Litecoin",			"LTC",	"litecoin"),
-			"DCR":	Chain("Decred",				"DCR",	"decred")
+index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0)),
+			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash",	(55,200,0)),
+			"ETH":	Chain("Ethereum",			"ETH",	"ethereum",		(0,153,200)),
+			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic", (0,253,100)),
+			"XMR":	Chain("Monero",				"XMR",	"monero",		(255,0,0)),
+			"LTC":	Chain("Litecoin",			"LTC",	"litecoin",		(0,0,255)),
+			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0))
 		}
 chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
-if SCREENS_CONNECTED:
+if SCREENS_ON:
 	screens = Screens()
+if STRIPS_ON:
+	strips = Strips()
+
 
 # cleanup at shutdown
 def cleanup():
-	# clear screens
-	if SCREENS_CONNECTED:
+	# clear screens and lights
+	if SCREENS_ON:
 		screens.clearAll()
+	if STRIPS_ON:
+		strips.allOff()
 atexit.register(cleanup)
 
 # WEB SERVER
@@ -106,8 +114,11 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		if self.path == "/getChainInfo":
 			chosenChain = index[data['sym']]
 			# push logo to screen
-			if SCREENS_CONNECTED:
+			if SCREENS_ON:
 				screens.showLogo(data['track'], chosenChain.logo)
+			# TEST turn on some LEDS!
+			if STRIPS_ON:
+				strips.stripe(int(data['track']-1)*75, int(data['track']-1)*75+75, *chosenChain.color)
 			# respond to browser
 			self.wfile.write(json.dumps({	"name": chosenChain.name,
 											"price": chosenChain.price,
