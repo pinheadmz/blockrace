@@ -5,28 +5,31 @@
 		body{
 			position: relative;
 			border: 1px solid black;
-			height: 480px;
-			width: 800px;
+			height: 478px;
+			width: 796px;
 			overflow: hidden;
+			padding: 0px;
+			margin: 0px;
 		}
 		
 		.panel{
 			border: 1px solid black;
 			border-radius: 10px;
-			margin: 1px;
+			margin: 1px 0px 0px 1px;
 		}
 		
 		.activeChains{
 			position: absolute;
 			top: 0px;
 			left: 0px;
-			height: 476px;
+			height: 477px;
 			width: 796px;
+			border-bottom: 1px solid black;
 		}
 		
 		.chainSelect{
-			height: 115px;
-			width: 115px;
+			height: 116px;
+			width: 116px;
 			overflow: hidden;
 			float: left;
 		}
@@ -41,21 +44,22 @@
 		}
 		
 		.chainInfo{
-			height: 115px;
-			width: 664px;
+			height: 116px;
+			width: 673px;
 			overflow: hidden;
 			float: right;
 			text-align: center;
 			font-family: monospace;
 			font-size: 15px;
+			margin-right: 1px;
 		}
 		
 		.chooser{
 			position: absolute;
 			top: 0px;
-			left: 124px;
-			height: 474px;
-			width: 670px;
+			left: 119px;
+			height: 473px;
+			width: 673px;
 			overflow: hidden;
 			z-index: 10;
 			display: none;
@@ -64,9 +68,10 @@
 		
 		.chainOption{
 			display: inline-block;
-			height: 140px;
+			height: 138px;
 			width: 100px;
 			overflow: hidden;
+			margin: 3px;
 		}
 		
 		.optionName{
@@ -120,7 +125,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
-	<div class="panel activeChains">
+	<div class="activeChains">
 		<div class="chainSelect panel" data-track="1"></div>
 		<div class="chainInfo panel" data-track="1"><div class="infoContainer"></div></div>
 		<div class="chainSelect panel" data-track="2"></div>
