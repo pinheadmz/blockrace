@@ -50,7 +50,7 @@ class Chain:
 		self.price = 0
 		self.hourPriceChange = 0
 		self.dayPriceChange = 0
-		self.netstat = 0
+		self.netstat = 12
 		# store history of chain tips
 		self.history = [Tip(0,0,0)]
 		# delegate API function
@@ -121,7 +121,7 @@ class Chain:
 		except:
 			print(self.name, "Error:", sys.exc_info())
 			return False
-		
+
 	def ETC_getTip(self):
 		try:
 			j = requests.get("https://api.gastracker.io/blocks/latest").json()
