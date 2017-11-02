@@ -151,7 +151,7 @@
 	});
 	
 	// UI FUNCTIONALITY
-	// choose a track on which to select a chain
+	// display menu of chains to assign to track
 	$('.chainSelect').click(function(){
 		if(!$(this).hasClass('selected')){
 			$('.selected').removeClass('selected');
@@ -162,28 +162,29 @@
 			showChooser(false);
 		}
 	});
-
 	// select a chain for the chosen track
 	$('.chainOption').click(function(){
 		var name = $(this).data('name')
 		var sym = $(this).data('sym')
 		var logo = $(this).data('logo')
+		// display chain logo on track
 		$('.selected').html("	<img src='i/128/" + logo + ".png'>");
+		// tell the track which chain it is:
 		$('.selected').data('sym', sym);
+		// clean up UI, report to server and get chain details
 		showChooser(false);
 		var track = $('.selected').data('track');
 		$('.selected').removeClass('selected');
-		// send command to server to update hardware
+		// send command to server to update screens and strips
 		$.ajax({
-			url: "getChainInfo",
+			url: "trackSelectedChain",
 			type: "POST",
 			dataType: "json",
 			data: JSON.stringify({track: track, sym: sym}),
-			success: function(ret){updateTrackInfo(track, ret);}
+			success: function(ret){getChainInfoAndUpdateDisplay(track, sym);}
 		});
 	});
-
-	// reveal LED strip visualizer menu for a track
+	// display menu of LED strip visualizers for a track
 	$('.chainInfo').click( function(){
 		$(this).children('.infoContainer').css('display','none');
 		$(this).append(	'<div class="chooseVis">' +
@@ -192,7 +193,7 @@
 						'<div class="visChoice" data-vis="txs"><span>Txs</span></div>' +
 						'</div>');	
 	});
-	// choose LED strip visualizer for track
+	// select LED strip visualizer for track
 	$('.chainInfo').on('click', '.visChoice', function(e){
 		e.stopPropagation();
 		var visChoice = $(this).data('vis');
@@ -217,8 +218,7 @@
 		else
 			$('.chooser').css('display', 'none')	
 	}
-	
-	// display network info on chain track
+	// display selected chain data on selected track
 	function updateTrackInfo(track, data){
 		timeAgo = Math.floor(Date.now() / 1000) - data['time'];
 		minsAgo = Math.floor(timeAgo/60);
@@ -247,7 +247,7 @@
 																		'<td>API Status: ' + stat + '</td></tr>' +
 																		'<tr><td colspan="4">Hash: ' + data['hash'] + '</td></tr></table>');
 	}
-
+	// get chain data from server and pass it to UI
 	function getChainInfoAndUpdateDisplay(track, sym){
 		$.ajax({
 			url: "getChainInfo",
@@ -257,14 +257,14 @@
 			success: function(ret){updateTrackInfo(track, ret);}
 		});
 	}
-
+	// utility
 	var money = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
 		minimumFractionDigits: 2
 	});
 	
-	// MAIN LOOP
+	//  ** MAIN LOOP **
 	setInterval(function(){
 		$('.chainSelect').each(function(i,v){
 			if ($(v).data('sym')){

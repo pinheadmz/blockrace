@@ -111,14 +111,19 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		self.data_string = self.rfile.read(int(self.headers['Content-Length']))
 		data = json.loads(self.data_string)
 
-		if self.path == "/getChainInfo":
+		if self.path == "/trackSelectedChain":
 			chosenChain = index[data['sym']]
+			track = data['track']
 			# push logo to screen
 			if SCREENS_ON:
-				screens.showLogo(data['track'], chosenChain.logo)
+				screens.showLogo(track, chosenChain.logo)
 			# TEST turn on some LEDS!
 			if STRIPS_ON:
-				strips.stripe(int(data['track']-1)*75, int(data['track']-1)*75+75, *chosenChain.color)
+				strips.stripe(int(track-1)*75, int(track-1)*75+75, *chosenChain.color)
+			self.wfile.write(json.dumps({"success": true}))
+										
+		if self.path == "/getChainInfo":
+			chosenChain = index[data['sym']]
 			# respond to browser
 			self.wfile.write(json.dumps({	"name": chosenChain.name,
 											"price": chosenChain.price,
