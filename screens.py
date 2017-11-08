@@ -29,17 +29,17 @@ class Screens():
 		self.disp.begin()
 		self.clearAll()
 
-	def showLogo(self, s, logo):
+	def showLogo(self, track, logo):
 		# load logo from file to new image object
 		image = Image.open(IMG_DIR + logo + '.jpg')
 		image = PIL.ImageOps.invert(image)
 		#image = image.rotate(0)
 		# push image to screen
-		self.selectScreen(s)
+		self.selectScreen(track)
 		self.disp.clear()
 		self.disp.display(image)
 
-	def showLogoWithText(self, s, logo, text, textColor):
+	def showLogoWithText(self, track, logo, text, textColor):
 		# initialize blank canvas then add logo from file
 		canvas = Image.new('RGB', WIDTH, HEIGHT)
 		logo = Image.open(IMG_DIR + logo + '.jpg')
@@ -58,7 +58,7 @@ class Screens():
 		d = ImageDraw.Draw(canvas)
 		d.text((-1, LOGO_HEIGHT - 5 + margin), text, font=font, fill=textColor)
 		# push image to screen
-		self.selectScreen(s)
+		self.selectScreen(track)
 		self.disp.clear()
 		self.disp.display(canvas)
 
@@ -71,7 +71,7 @@ class Screens():
 		for p in self.csPins:
 			self.gpio.output(p, GPIO.LOW)
 
-	def selectScreen(self, s):
+	def selectScreen(self, track):
 		for p in self.csPins:
 			self.gpio.output(p, GPIO.HIGH)
-		self.gpio.output(self.csPins[s], GPIO.LOW)
+		self.gpio.output(self.csPins[track], GPIO.LOW)

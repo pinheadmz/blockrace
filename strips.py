@@ -1,5 +1,9 @@
 import time
+import random
 from neopixel import *
+
+# constants 
+TRACK_LENGTH = 75
 
 # LED strip configuration:
 LED_COUNT      = 300      # Number of LED pixels.
@@ -7,7 +11,7 @@ LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10       # DMA channel to use for generating signal (try 5)
-LED_BRIGHTNESS = 120     # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 LED_STRIP      = ws.WS2811_STRIP_GRB   # Strip type and colour ordering
@@ -25,11 +29,29 @@ class Strips():
 			self.strip.setPixelColor(i, Color(0,0,0))
 		self.strip.show()
 
-	# set range of lights to one color
-	def stripe(self, start, end, r, g, b):
+	# set range to one solid color
+	def stripe(self, start, end, color):
 		for i in range(start, end):
-			self.strip.setPixelColor(i, Color(r, g, b))
+			self.strip.setPixelColor(i, Color(color))
 		self.strip.show()
+	
+	# set track to one color with random brightnesses for twinkle effect
+	def twinkle(self, track, color):
+		for i in range (track * TRACK_LENGTH, track * TRACK_LENGTH + TRACK_LENGTH):
+			brightness = random.randint(1,100)/100.0
+			self.strip.setPixelColor(i, Color(tuple(int(x * brightness) for x in color))
+		self.strip.show()
+
+	# light specific dots in a track to one color
+	def dots(self, track, color, pattern):
+		for i in range (track * TRACK_LENGTH, track * TRACK_LENGTH + TRACK_LENGTH):
+			brightness = 0.2
+			bgColor = tuple(int(x * brightness) for x in color)
+			self.strip.setPixelColor(i, Color(bgColor))
+		for j in pattern:
+			self.strip.setPixelColor(j, Color(color))
+		self.strip.show()
+
 '''
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=5):

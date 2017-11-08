@@ -166,10 +166,10 @@ while True:
 	# refresh chain data from APIs in multiple threads
 	a = pool.map(operator.methodcaller('refresh'), chains)
 	b = pool.map(operator.methodcaller('getPrice'), chains)
-	# print debug info to screen
-	os.system('clear')
-	for i in chains:
-		i.display()
+	## print debug info to screen
+	#os.system('clear')
+	#for i in chains:
+	#	i.display()
 	# refresh screens and strips for each track - ALSO API REFRESH
 	tick = 0
 	while tick < API_REFRESH:

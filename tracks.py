@@ -32,4 +32,11 @@ class Track():
 				screens.showLogoWithText(self.id, self.chain.logo, text, (255, 255, 255)):
 
 		if STRIPS_ON:
-			strips.stripe(int(track)*75, int(track)*75+75, *chosenChain.color)
+			if self.vis == 'flag':
+				strips.twinkle(self.id, self.chain.color)
+			if self.vis == 'blocks':
+				
+				strips.twinkle(self.id, self.chain.color, pattern)
+			if self.vis == 'price':
+
+			if self.vis == 'txs':

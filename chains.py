@@ -5,7 +5,7 @@ import sys
 import os
 
 # Constants
-MAX_BLOCK_HISTORY = 4
+MAX_BLOCK_HISTORY = 40
 
 # Utility
 def jsonPP(string):
