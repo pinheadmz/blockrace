@@ -115,7 +115,7 @@
 		}
 		
 		.visChoice span{
-			top: 33%;
+			top: 25%;
 		    position: relative;
 		    font-family: sans-serif;
 		    font-size: 20px;
@@ -126,14 +126,14 @@
 </head>
 <body>
 	<div class="activeChains">
+		<div class="chainSelect panel" data-track="0"></div>
+		<div class="chainInfo panel" data-track="0"><div class="infoContainer"></div></div>
 		<div class="chainSelect panel" data-track="1"></div>
 		<div class="chainInfo panel" data-track="1"><div class="infoContainer"></div></div>
 		<div class="chainSelect panel" data-track="2"></div>
 		<div class="chainInfo panel" data-track="2"><div class="infoContainer"></div></div>
 		<div class="chainSelect panel" data-track="3"></div>
 		<div class="chainInfo panel" data-track="3"><div class="infoContainer"></div></div>
-		<div class="chainSelect panel" data-track="4"></div>
-		<div class="chainInfo panel" data-track="4"><div class="infoContainer"></div></div>
 	</div>
 	<div class="panel chooser">
 	</div>
@@ -190,6 +190,7 @@
 	$('.chainInfo').click( function(){
 		$(this).children('.infoContainer').css('display','none');
 		$(this).append(	'<div class="chooseVis">' +
+						'<div class="visChoice" data-vis="flag"><span>Flag</span></div>' +
 						'<div class="visChoice" data-vis="blocks"><span>Blocks</span></div>' +
 						'<div class="visChoice" data-vis="price"><span>Price</span></div>' +
 						'<div class="visChoice" data-vis="txs"><span>Txs</span></div>' +

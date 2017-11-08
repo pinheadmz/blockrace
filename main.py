@@ -1,3 +1,7 @@
+# configure hardware
+SCREENS_ON = True
+STRIPS_ON = True
+
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
 from os import curdir, sep
@@ -7,16 +11,16 @@ from multiprocessing.dummy import Pool as ThreadPool
 import thread
 import atexit
 
+# import other blockrace modules
 from chains import *
-
-SCREENS_ON = True
-STRIPS_ON = True
+from tracks import *
 if SCREENS_ON:
 	from screens import *
 if STRIPS_ON:
 	from strips import *
 
 # CONSTANTS
+# 			index			name				sym		logo			color
 index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0)),
 			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash",	(55,200,0)),
 			"ETH":	Chain("Ethereum",			"ETH",	"ethereum",		(0,153,200)),
@@ -26,11 +30,13 @@ index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0)),
 			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0))
 		}
 chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
+tracks = [Track(0), Track(1), Track(2), Track(3)]
 if SCREENS_ON:
 	screens = Screens()
 if STRIPS_ON:
 	strips = Strips()
-
+API_REFRESH = 3
+VIS_REFRESH = 0.25
 
 # cleanup at shutdown
 def cleanup():
@@ -52,7 +58,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		self._set_headers()
 
 	def do_GET(self):
-		# DYNAMIC js file
+		# DYNAMICALLY GENERATED js file - special GET case
 		if self.path == "/chainsIndex.js":
 			chainsIndex = []
 			for chain in chains:
@@ -68,8 +74,11 @@ class HTTPHandler(BaseHTTPRequestHandler):
 			self.wfile.write(jsString)
 			return
 
+		# main UI page
 		if self.path == "/":
 			self.path = "index.html"
+
+		# GET the requested file from /www
 		try:
 			#Check the file extension required and set the right mime type
 			sendReply = False
@@ -111,17 +120,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 		self.data_string = self.rfile.read(int(self.headers['Content-Length']))
 		data = json.loads(self.data_string)
 
-		if self.path == "/trackSelectedChain":
-			chosenChain = index[data['sym']]
-			track = data['track']
-			# push logo to screen
-			if SCREENS_ON:
-				screens.showLogo(track, chosenChain.logo)
-			# TEST turn on some LEDS!
-			if STRIPS_ON:
-				strips.stripe(int(track-1)*75, int(track-1)*75+75, *chosenChain.color)
-			self.wfile.write(json.dumps({"success": True}))
-
+		# user requesting info for a chain to display on the touchscreen
 		if self.path == "/getChainInfo":
 			chosenChain = index[data['sym']]
 			# respond to browser
@@ -136,28 +135,45 @@ class HTTPHandler(BaseHTTPRequestHandler):
 											"netstat": chosenChain.netstat
 										}))
 
+		# user selecting a chain for a track
+		if self.path == "/trackSelectedChain":
+			track = data['track']
+			chosenChain = index[data['sym']]
+			tracks[track].setChain(chosenChain)
+			self.wfile.write(json.dumps({"success": True}))
+
+		# user choosing a display mode for LED strips and screens text
 		if self.path == "/setVis":
-			# TODO
-			print(json.dumps(data))
-			self.wfile.write(json.dumps(data))
+			track = data['track']
+			visChoice = data['visChoice']
+			tracks[track].setVis(visChoice)
+			self.wfile.write(json.dumps({"success": True}))
 		return
 
+# start the web server in a background thread
 def startServer(server_class=HTTPServer, handler_class=HTTPHandler, port=8080):
 	server_address = ('', port)
 	httpd = server_class(server_address, handler_class)
 	print 'Starting httpd...'
 	httpd.serve_forever()
-
-# start the web server in a background thread
 thread.start_new_thread(startServer, ())
 
-# START API SCRAPER
+## MAIN LOOP ##
 pool = ThreadPool(8)
 while True:
+	# refresh price data
 	Ticker.refresh()
+	# refresh chain data from APIs in multiple threads
 	a = pool.map(operator.methodcaller('refresh'), chains)
 	b = pool.map(operator.methodcaller('getPrice'), chains)
+	# print debug info to screen
 	os.system('clear')
 	for i in chains:
 		i.display()
-	time.sleep(3)
+	# refresh screens and strips for each track - ALSO API REFRESH
+	tick = 0
+	while tick < API_REFRESH:
+		for t in tracks:
+			t.refresh()
+		time.sleep(VIS_REFRESH)
+		tick += VIS_REFRESH

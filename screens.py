@@ -1,17 +1,18 @@
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import PIL.ImageOps
 import ST7735 as TFT
 import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import time
 
-
+# constants for ST7735 and image objects
 WIDTH = 128
 HEIGHT = 160
 SPEED_HZ = 4000000
 IMG_DIR = '/home/pi/blockrace/jpg128/'
+LOGO_HEIGHT = 128
 
-# Raspberry Pi configuration.
+# Raspberry Pi configuration
 DC = 24
 RST = 25
 SPI_PORT = 0
@@ -29,12 +30,37 @@ class Screens():
 		self.clearAll()
 
 	def showLogo(self, s, logo):
+		# load logo from file to new image object
 		image = Image.open(IMG_DIR + logo + '.jpg')
 		image = PIL.ImageOps.invert(image)
 		#image = image.rotate(0)
+		# push image to screen
 		self.selectScreen(s)
 		self.disp.clear()
 		self.disp.display(image)
+
+	def showLogoWithText(self, s, logo, text, textColor):
+		# initialize blank canvas then add logo from file
+		canvas = Image.new('RGB', WIDTH, HEIGHT)
+		logo = Image.open(IMG_DIR + logo + '.jpg')
+		logo = PIL.ImageOps.invert(image)
+		canvas.paste(logo, (0,0))
+		# calculate best-fit font size (by width) and add text
+		size = 1
+		font = ImageFont.truetype('fonts/verdana.ttf', size)
+		while font.getsize(text)[0] < 128:
+			size += 1
+			font = ImageFont.truetype('fonts/verdana.ttf', size)
+		# center vertically
+		textHeight = font.getsize(text)[1]
+		space = HEIGHT - LOGO_HEIGHT
+		margin = (space - textHeight) / 2
+		d = ImageDraw.Draw(canvas)
+		d.text((-1, LOGO_HEIGHT - 5 + margin), text, font=font, fill=textColor)
+		# push image to screen
+		self.selectScreen(s)
+		self.disp.clear()
+		self.disp.display(canvas)
 
 	def clearAll(self):
 		self.selectAllScreens()
@@ -46,7 +72,6 @@ class Screens():
 			self.gpio.output(p, GPIO.LOW)
 
 	def selectScreen(self, s):
-		s -= 1
 		for p in self.csPins:
 			self.gpio.output(p, GPIO.HIGH)
 		self.gpio.output(self.csPins[s], GPIO.LOW)
