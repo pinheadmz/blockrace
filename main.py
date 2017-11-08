@@ -120,8 +120,8 @@ class HTTPHandler(BaseHTTPRequestHandler):
 			# TEST turn on some LEDS!
 			if STRIPS_ON:
 				strips.stripe(int(track-1)*75, int(track-1)*75+75, *chosenChain.color)
-			self.wfile.write(json.dumps({"success": true}))
-										
+			self.wfile.write(json.dumps({"success": True}))
+
 		if self.path == "/getChainInfo":
 			chosenChain = index[data['sym']]
 			# respond to browser

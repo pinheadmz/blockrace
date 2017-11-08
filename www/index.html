@@ -180,9 +180,11 @@
 			url: "trackSelectedChain",
 			type: "POST",
 			dataType: "json",
-			data: JSON.stringify({track: track, sym: sym}),
-			success: function(ret){getChainInfoAndUpdateDisplay(track, sym);}
+			data: JSON.stringify({track: track, sym: sym})
 		});
+		// get details for chain for track
+		getChainInfoAndUpdateDisplay(track, sym);
+
 	});
 	// display menu of LED strip visualizers for a track
 	$('.chainInfo').click( function(){

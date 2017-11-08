@@ -25,7 +25,7 @@ class Strips():
 			self.strip.setPixelColor(i, Color(0,0,0))
 		self.strip.show()
 
-	# set range of lights to one color and everything else off
+	# set range of lights to one color
 	def stripe(self, start, end, r, g, b):
 		for i in range(start, end):
 			self.strip.setPixelColor(i, Color(r, g, b))
