@@ -2,7 +2,7 @@ import time
 import random
 from neopixel import *
 
-# constants 
+# constants
 TRACK_LENGTH = 75
 TARGET_BLOCK_COUNT = 8
 
@@ -23,6 +23,7 @@ class Strips():
 		self.strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, LED_STRIP)
 		# Intialize the library (must be called once before other functions).
 		self.strip.begin()
+		self.allOff()
 
 	# all lights off
 	def allOff(self):
@@ -33,39 +34,41 @@ class Strips():
 	# set range to one solid color
 	def stripe(self, start, end, color):
 		for i in range(start, end):
-			self.strip.setPixelColor(i, Color(color))
+			self.strip.setPixelColor(i, Color(*color))
 		self.strip.show()
-	
+
 	# set track to one color with random brightnesses for twinkle effect
 	def twinkle(self, track, color):
 		for i in range (track * TRACK_LENGTH, track * TRACK_LENGTH + TRACK_LENGTH):
 			brightness = random.randint(1,100)/100.0
-			self.strip.setPixelColor(i, Color(tuple(int(x * brightness) for x in color)))
+			self.strip.setPixelColor(i, Color(*tuple(int(x * brightness) for x in color)))
 		self.strip.show()
 
 	# light specific dots in a track to one color
 	def blocks(self, track, color, interval, history):
 		# based on speed of coin, tune the speed of the dots
 		dotInterval = TRACK_LENGTH / TARGET_BLOCK_COUNT
-		dotTime = dotInterval / interval
-		trackTime = dotTime * TRACK_LENGTH
+		dotTime = interval / dotInterval
+		trackTime = dotTime * (TRACK_LENGTH - 1)
 		now = int(time.time())
-		
+
 		# construct dot pattern from chain history
 		pattern = []
 		tip = -1
 		while now - history[tip].time <= trackTime:
 			timeSince = now - history[tip].time
-			pattern.append(timeSince * dotTime)
+			pattern.append(timeSince / dotTime)
 			tip -= 1
+			if tip * -1 > len( history):
+				break
 
 		# set background color then add bright dots
 		for i in range (track * TRACK_LENGTH, track * TRACK_LENGTH + TRACK_LENGTH):
-			brightness = 0.2
+			brightness = 0.05
 			bgColor = tuple(int(x * brightness) for x in color)
-			self.strip.setPixelColor(i, Color(bgColor))
+			self.strip.setPixelColor(i, Color(*bgColor))
 		for j in pattern:
-			self.strip.setPixelColor(track * TRACK_LENGTH + j, Color(color))
+			self.strip.setPixelColor(track * TRACK_LENGTH + j, Color(*color))
 		self.strip.show()
 
 '''

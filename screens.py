@@ -41,14 +41,14 @@ class Screens():
 
 	def showLogoWithText(self, track, logo, text, textColor):
 		# initialize blank canvas then add logo from file
-		canvas = Image.new('RGB', WIDTH, HEIGHT)
+		canvas = Image.new('RGB', (WIDTH, HEIGHT))
 		logo = Image.open(IMG_DIR + logo + '.jpg')
-		logo = PIL.ImageOps.invert(image)
+		logo = PIL.ImageOps.invert(logo)
 		canvas.paste(logo, (0,0))
 		# calculate best-fit font size (by width) and add text
 		size = 1
 		font = ImageFont.truetype('fonts/verdana.ttf', size)
-		while font.getsize(text)[0] < 128:
+		while font.getsize(text)[0] < WIDTH-5:
 			size += 1
 			font = ImageFont.truetype('fonts/verdana.ttf', size)
 		# center vertically

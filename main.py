@@ -1,7 +1,3 @@
-# configure hardware
-SCREENS_ON = False
-STRIPS_ON = False
-
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
 from os import curdir, sep
@@ -11,13 +7,17 @@ from multiprocessing.dummy import Pool as ThreadPool
 import thread
 import atexit
 
+# configure hardware
+SCREENS_ON = True
+STRIPS_ON = True
+
 # import other blockrace modules
-from chains import *
-from tracks import *
 if SCREENS_ON:
 	from screens import *
 if STRIPS_ON:
 	from strips import *
+from chains import *
+from tracks import *
 
 # CONSTANTS
 # 			index			name				sym		logo			color		interval
@@ -30,21 +30,20 @@ index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0),	600),
 			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0),		300)
 		}
 chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
-tracks = [Track(0), Track(1), Track(2), Track(3)]
-if SCREENS_ON:
-	screens = Screens()
-if STRIPS_ON:
-	strips = Strips()
+G = {}
+G['screens'] = Screens() if SCREENS_ON else False
+G['strips'] = Strips() if STRIPS_ON else False
+tracks = [Track(0, G), Track(1, G), Track(2, G), Track(3, G)]
 API_REFRESH = 3
 VIS_REFRESH = 0.25
 
 # cleanup at shutdown
 def cleanup():
 	# clear screens and lights
-	if SCREENS_ON:
-		screens.clearAll()
-	if STRIPS_ON:
-		strips.allOff()
+	if G['screens']:
+		G['screens'].clearAll()
+	if G['strips']:
+		G['strips'].allOff()
 atexit.register(cleanup)
 
 # WEB SERVER
@@ -158,8 +157,18 @@ def startServer(server_class=HTTPServer, handler_class=HTTPHandler, port=8080):
 	httpd.serve_forever()
 thread.start_new_thread(startServer, ())
 
-## MAIN LOOP ##
+# refresh screens and strips for each track in background thread
+def animate():
+	while True:
+		for t in tracks:
+			t.refresh()
+		time.sleep(VIS_REFRESH)
+thread.start_new_thread(animate, ())
+
+
+# API refresh loop
 pool = ThreadPool(8)
+tick = 0
 while True:
 	# refresh price data
 	Ticker.refresh()
@@ -170,10 +179,4 @@ while True:
 	#os.system('clear')
 	#for i in chains:
 	#	i.display()
-	# refresh screens and strips for each track - ALSO API REFRESH
-	tick = 0
-	while tick < API_REFRESH:
-		for t in tracks:
-			t.refresh()
-		time.sleep(VIS_REFRESH)
-		tick += VIS_REFRESH
+	time.sleep(API_REFRESH)
