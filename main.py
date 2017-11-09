@@ -1,6 +1,6 @@
 # configure hardware
-SCREENS_ON = True
-STRIPS_ON = True
+SCREENS_ON = False
+STRIPS_ON = False
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
@@ -20,14 +20,14 @@ if STRIPS_ON:
 	from strips import *
 
 # CONSTANTS
-# 			index			name				sym		logo			color
-index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0)),
-			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash",	(55,200,0)),
-			"ETH":	Chain("Ethereum",			"ETH",	"ethereum",		(0,153,200)),
-			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic", (0,253,100)),
-			"XMR":	Chain("Monero",				"XMR",	"monero",		(255,0,0)),
-			"LTC":	Chain("Litecoin",			"LTC",	"litecoin",		(0,0,255)),
-			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0))
+# 			index			name				sym		logo			color		interval
+index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0),	600),
+			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash",	(55,200,0),		600),
+			"ETH":	Chain("Ethereum",			"ETH",	"ethereum",		(0,153,200),	12),
+			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic", (0,253,100),12),
+			"XMR":	Chain("Monero",				"XMR",	"monero",		(255,0,0),		120),
+			"LTC":	Chain("Litecoin",			"LTC",	"litecoin",		(0,0,255),		150),
+			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0),		300)
 		}
 chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
 tracks = [Track(0), Track(1), Track(2), Track(3)]

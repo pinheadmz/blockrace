@@ -16,27 +16,27 @@ class Track():
 
 		if SCREENS_ON:
 			if self.vis == 'flag':
-				screens.showLogoWithText(self.id, self.chain.logo, self.chain.name, (255, 255, 255)):
+				screens.showLogoWithText(self.id, self.chain.logo, self.chain.name, (255, 255, 255))
 			if self.vis == 'blocks':
 				height = self.chain.history[-1].height
 				text = self.chain.sym + ": " + height
-				screens.showLogoWithText(self.id, self.chain.logo, text, (255, 255, 255)):
+				screens.showLogoWithText(self.id, self.chain.logo, text, (255, 255, 255))
 			if self.vis == 'price':
 				price = self.chain.price
 				price = '${:,.2f}'.format(float(price))
 				text = self.chain.sym + ": " + price
-				screens.showLogoWithText(self.id, self.chain.logo, text, (255, 255, 255)):
+				screens.showLogoWithText(self.id, self.chain.logo, text, (255, 255, 255))
 			if self.vis == 'txs':
 				numTxs = self.chain.history[-1].numTxs
 				text = self.chain.sym + ": " + numTxs
-				screens.showLogoWithText(self.id, self.chain.logo, text, (255, 255, 255)):
+				screens.showLogoWithText(self.id, self.chain.logo, text, (255, 255, 255))
 
 		if STRIPS_ON:
 			if self.vis == 'flag':
 				strips.twinkle(self.id, self.chain.color)
 			if self.vis == 'blocks':
-				
-				strips.twinkle(self.id, self.chain.color, pattern)
+				strips.blocks(self.id, self.chain.color, self.chain.interval, self.chain.history)
 			if self.vis == 'price':
-
+				return
 			if self.vis == 'txs':
+				return

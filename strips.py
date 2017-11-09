@@ -4,6 +4,7 @@ from neopixel import *
 
 # constants 
 TRACK_LENGTH = 75
+TARGET_BLOCK_COUNT = 8
 
 # LED strip configuration:
 LED_COUNT      = 300      # Number of LED pixels.
@@ -39,17 +40,32 @@ class Strips():
 	def twinkle(self, track, color):
 		for i in range (track * TRACK_LENGTH, track * TRACK_LENGTH + TRACK_LENGTH):
 			brightness = random.randint(1,100)/100.0
-			self.strip.setPixelColor(i, Color(tuple(int(x * brightness) for x in color))
+			self.strip.setPixelColor(i, Color(tuple(int(x * brightness) for x in color)))
 		self.strip.show()
 
 	# light specific dots in a track to one color
-	def dots(self, track, color, pattern):
+	def blocks(self, track, color, interval, history):
+		# based on speed of coin, tune the speed of the dots
+		dotInterval = TRACK_LENGTH / TARGET_BLOCK_COUNT
+		dotTime = dotInterval / interval
+		trackTime = dotTime * TRACK_LENGTH
+		now = int(time.time())
+		
+		# construct dot pattern from chain history
+		pattern = []
+		tip = -1
+		while now - history[tip].time <= trackTime:
+			timeSince = now - history[tip].time
+			pattern.append(timeSince * dotTime)
+			tip -= 1
+
+		# set background color then add bright dots
 		for i in range (track * TRACK_LENGTH, track * TRACK_LENGTH + TRACK_LENGTH):
 			brightness = 0.2
 			bgColor = tuple(int(x * brightness) for x in color)
 			self.strip.setPixelColor(i, Color(bgColor))
 		for j in pattern:
-			self.strip.setPixelColor(j, Color(color))
+			self.strip.setPixelColor(track * TRACK_LENGTH + j, Color(color))
 		self.strip.show()
 
 '''
