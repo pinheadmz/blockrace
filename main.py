@@ -35,7 +35,7 @@ G['screens'] = Screens() if SCREENS_ON else False
 G['strips'] = Strips() if STRIPS_ON else False
 tracks = [Track(0, G), Track(1, G), Track(2, G), Track(3, G)]
 API_REFRESH = 3
-VIS_REFRESH = 0.25
+VIS_REFRESH = 0.001
 
 # cleanup at shutdown
 def cleanup():
@@ -162,6 +162,8 @@ def animate():
 	while True:
 		for t in tracks:
 			t.refresh()
+		if G['strips']:
+			G['strips'].strip.show()
 		time.sleep(VIS_REFRESH)
 thread.start_new_thread(animate, ())
 
