@@ -38,8 +38,13 @@ API_REFRESH = 3
 VIS_REFRESH = 0.001
 
 # cleanup at shutdown
+RUN_THREADS = True
 def cleanup():
+	# switch off flag to kill threads
+	global RUN_THREADS
+	RUN_THREADS = False
 	# clear screens and lights
+	print "Cleanup: stopping visualizers"
 	if G['screens']:
 		G['screens'].clearAll()
 	if G['strips']:
@@ -153,18 +158,24 @@ class HTTPHandler(BaseHTTPRequestHandler):
 def startServer(server_class=HTTPServer, handler_class=HTTPHandler, port=8080):
 	server_address = ('', port)
 	httpd = server_class(server_address, handler_class)
-	print 'Starting httpd...'
+	print "Starting http server..."
 	httpd.serve_forever()
 thread.start_new_thread(startServer, ())
 
 # refresh screens and strips for each track in background thread
 def animate():
-	while True:
+	while RUN_THREADS:
 		for t in tracks:
 			t.refresh()
 		if G['strips']:
 			G['strips'].strip.show()
 		time.sleep(VIS_REFRESH)
+	# stop and clear when run flag is killed
+	print "Animate: stopping visualizers..."
+	if G['strips']:
+		G['strips'].allOff()
+	if G['screens']:
+		G['screens'].clearAll()
 thread.start_new_thread(animate, ())
 
 

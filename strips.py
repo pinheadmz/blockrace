@@ -6,7 +6,9 @@ from neopixel import *
 NUM_TRACKS = 4
 TRACK_LENGTH = 75
 TARGET_BLOCK_COUNT = 8
-BRIGHTNESS_NOTCH = 0.01	# between 0 and 1
+BRIGHTNESS_NOTCH = 5
+MIN_BRIGHTNESS = 1
+MAX_BRIGHTNESS = 100
 
 # LED strip configuration:
 LED_COUNT      = 300      # Number of LED pixels.
@@ -26,7 +28,8 @@ class Strips():
 		# Intialize the library (must be called once before other functions).
 		self.strip.begin()
 		self.allOff()
-		self.randBrightness = [random.randint(40,60)/100.0 for x in range(TRACK_LENGTH * NUM_TRACKS)]
+		self.randBrightness = [random.randint(MIN_BRIGHTNESS, MAX_BRIGHTNESS) for x in range(TRACK_LENGTH * NUM_TRACKS)]
+		self.brightnessDirection = [random.choice([-1,1]) for x in range(TRACK_LENGTH * NUM_TRACKS)]
 
 	# all lights off
 	def allOff(self):
@@ -42,14 +45,13 @@ class Strips():
 	# set track to one color with random brightnesses for twinkle effect
 	def twinkle(self, track, color):
 		for i in range (track * TRACK_LENGTH, track * TRACK_LENGTH + TRACK_LENGTH):
-			brightness = self.randBrightness[i]
-			self.strip.setPixelColor(i, Color(*tuple(int(x * brightness) for x in color)))
 			# modulate brightness slowly between frames
-			self.randBrightness[i] += (random.randint(-1,1) * BRIGHTNESS_NOTCH)
-			if self.randBrightness[i] < 0:
-				self.randBrightness[i] = 0
-			if self.randBrightness[i] > 1:
-				self.randBrightness[i] = 1
+			if self.randBrightness[i] >= MAX_BRIGHTNESS - BRIGHTNESS_NOTCH:
+				self.brightnessDirection[i] = -1
+			if self.randBrightness[i] <= MIN_BRIGHTNESS + BRIGHTNESS_NOTCH:
+				self.brightnessDirection[i] = 1
+			self.randBrightness[i] += (self.brightnessDirection[i] * BRIGHTNESS_NOTCH)
+			self.strip.setPixelColor(i, Color(*tuple(int(x * self.randBrightness[i] / MAX_BRIGHTNESS) for x in color)))
 
 	# light specific dots in a track to one color
 	def blocks(self, track, color, interval, history):
