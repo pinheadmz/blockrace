@@ -80,16 +80,23 @@
 			text-align: center;
 			width: 100%;
 		}
+
+		.chainInfoTop{
+			width: 95%;
+			margin: auto;
+		}
 		
 		.chainName{
-			font-size: 20px;
+			font-size: 40px;
 			font-family: sans-serif;
-			text-decoration: underline;
+			float: left;
+			/*text-decoration: underline;*/
 		}
 		
 		.chainPrice{
-			font-size: 18px;
+			font-size: 40px;
 			font-family: sans-serif;
+			float: right;
 		}
 		
 		.infoTable{
@@ -120,7 +127,15 @@
 			font-family: sans-serif;
 			font-size: 20px;
 		}
-
+		
+		@keyframes pulse {
+			0% { background-color: #ffff99; }
+			100% { background-color: white; }
+		}
+		
+		.flash{
+			animation: pulse 1s;
+		}
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
@@ -223,9 +238,11 @@
 	}
 	// display selected chain data on selected track
 	function updateTrackInfo(track, data){
+		// calculate human-readable time since last block
 		timeAgo = Math.floor(Date.now() / 1000) - data['time'];
 		minsAgo = Math.floor(timeAgo/60);
 		secsAgo = timeAgo%60;
+		// choose color for API status
 		if (data['netstat'] < 4)
 			stat = "<span style='color:green'>Good</span>";
 		else if (data['netstat'] < 8)
@@ -234,21 +251,26 @@
 			stat = "<span style='color:red'>Bad</span>";
 		else if (data['netstat'] >= 12)
 			stat = "<span style='color:brown'>Broken</span>";
-			
+		// format the price change color and symbol
 		if (data['dayPriceChange'] > 0)
 			gain = "<span style='color:green'> (+"
 		else
 			gain = "<span style='color:red'> ("
-
+		// insert the HTML into the UI
 		$('.chainInfo[data-track=' + track + '] .infoContainer').html(	'<br>' +
-																		'<span class="chainName">' + data['name'] + '</span><br>' +
-																		'<span class="chainPrice">Price: ' + money.format(data['price']) + gain + data['dayPriceChange'] +'%)</span></span><br>' +
+																		'<div class="chainInfoTop">' +
+																		'<span class="chainName">' + data['name'] + '</span>' +
+																		'<span class="chainPrice">' + money.format(data['price']) + gain + data['dayPriceChange'] +'%)</span></span><br>' +
+																		'</div>' +
 																		'<table class="infoTable"><tr>' +
 																		'<td>Latest block: ' + data['height'] + '</td>' +
 																		'<td>' + minsAgo + ' Min, ' + secsAgo + ' Sec ago</td>' +
 																		'<td># Txs: ' + data['numTxs'] + '</td>' +
 																		'<td>API Status: ' + stat + '</td></tr>' +
 																		'<tr><td colspan="4">Hash: ' + data['hash'] + '</td></tr></table>');
+		// flash bg color on new blocks
+		if (timeAgo < 2)
+			$('.chainInfo[data-track=' + track + '] .infoTable').addClass('flash');
 	}
 	// get chain data from server and pass it to UI
 	function getChainInfoAndUpdateDisplay(track, sym){
@@ -274,6 +296,6 @@
 				getChainInfoAndUpdateDisplay($(v).data('track'), $(v).data('sym'))
 			}
 		});	
-	},3000);
+	},1000);
 </script>
 </html>
