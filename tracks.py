@@ -55,6 +55,7 @@ class Track():
 			if self.vis == 'blocks':
 				self.strips.blocks(self.id, self.chain.color, self.chain.interval, self.chain.history)
 			if self.vis == 'price':
+				self.strips.price(self.id, self.chain.dayPriceChange)
 				return
 			if self.vis == 'txs':
 				return

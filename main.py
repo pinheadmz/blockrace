@@ -41,14 +41,17 @@ VIS_REFRESH = 0.001
 RUN_THREADS = True
 def cleanup():
 	# switch off flag to kill threads
-	global RUN_THREADS
+	global RUN_THREADS, G
 	RUN_THREADS = False
 	# clear screens and lights
-	print "Cleanup: stopping visualizers"
+	print "Cleanup: stopping visualizers:"
+	print G
 	if G['screens']:
 		G['screens'].clearAll()
+		G['screens'] = False
 	if G['strips']:
 		G['strips'].allOff()
+		G['strips'] = False
 atexit.register(cleanup)
 
 # WEB SERVER
@@ -164,6 +167,7 @@ thread.start_new_thread(startServer, ())
 
 # refresh screens and strips for each track in background thread
 def animate():
+	global G
 	while RUN_THREADS:
 		for t in tracks:
 			t.refresh()
@@ -171,11 +175,14 @@ def animate():
 			G['strips'].strip.show()
 		time.sleep(VIS_REFRESH)
 	# stop and clear when run flag is killed
-	print "Animate: stopping visualizers..."
+	print "Animate: stopping visualizers:"
+	print G
 	if G['strips']:
 		G['strips'].allOff()
+		G['strips'] = False
 	if G['screens']:
 		G['screens'].clearAll()
+		G['screens'] = False
 thread.start_new_thread(animate, ())
 
 

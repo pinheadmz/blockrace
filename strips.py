@@ -5,10 +5,11 @@ from neopixel import *
 # constants
 NUM_TRACKS = 4
 TRACK_LENGTH = 75
-TARGET_BLOCK_COUNT = 8
+TARGET_BLOCK_COUNT = 8		# speed of blocks mode target based on coin interval
 BRIGHTNESS_NOTCH = 5
 MIN_BRIGHTNESS = 1
 MAX_BRIGHTNESS = 100
+PRICE_CHANGE_RANGE = 5 		# means 5% up or down
 
 # LED strip configuration:
 LED_COUNT      = 300      # Number of LED pixels.
@@ -78,6 +79,16 @@ class Strips():
 			self.strip.setPixelColor(i, Color(*bgColor))
 		for j in pattern:
 			self.strip.setPixelColor(track * TRACK_LENGTH + j, Color(*color))
+
+		# indicate price change
+		def price(self, track, dayPriceChange):
+			center = TRACK_LENGTH / 2
+			dotsPerPct = center / PRICE_CHANGE_RANGE
+			dotsOn = int((dotsPerPct * 100) / (dayPriceChange * 100))
+			color = Color(255,0,0) if dayPriceChange < 0 else Color(0,255,0)
+			for i in range (min(center+dotsOn, center), max(center+dotsOn, center)):
+				dot = (track * TRACK_LENGTH) + i
+				self.strip.setPixelColor(i, color)
 
 '''
 # Define functions which animate LEDs in various ways.
