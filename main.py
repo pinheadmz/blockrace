@@ -20,22 +20,23 @@ from chains import *
 from tracks import *
 
 # CONSTANTS
-# 			index			name				sym		logo			color		interval
-index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0),	600),
-			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash",	(55,200,0),		600),
-			"ETH":	Chain("Ethereum",			"ETH",	"ethereum",		(0,153,200),	12),
-			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic", (0,253,100),12),
-			"XMR":	Chain("Monero",				"XMR",	"monero",		(255,0,0),		120),
-			"LTC":	Chain("Litecoin",			"LTC",	"litecoin",		(0,0,255),		150),
-			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0),		300)
+API_REFRESH = 3
+VIS_REFRESH = 0.001
+# 			index			name				sym		logo			color		interval	timeout
+index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0),	600,	API_REFRESH),
+			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash",	(55,200,0),		600,	API_REFRESH),
+			"ETH":	Chain("Ethereum",			"ETH",	"ethereum",		(0,153,200),	12,		API_REFRESH),
+			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic", (0,253,100),12	,	API_REFRESH),
+			"XMR":	Chain("Monero",				"XMR",	"monero",		(255,0,0),		120,	API_REFRESH),
+			"LTC":	Chain("Litecoin",			"LTC",	"litecoin",		(0,0,255),		150,	API_REFRESH),
+			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0),		300,	API_REFRESH)
 		}
 chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
+ticker = Ticker(API_REFRESH)
 G = {}
 G['screens'] = Screens() if SCREENS_ON else False
 G['strips'] = Strips() if STRIPS_ON else False
 tracks = [Track(0, G), Track(1, G), Track(2, G), Track(3, G)]
-API_REFRESH = 3
-VIS_REFRESH = 0.001
 
 # cleanup at shutdown
 RUN_THREADS = True
@@ -193,10 +194,10 @@ pool = ThreadPool(8)
 tick = 0
 while True:
 	# refresh price data
-	Ticker.refresh()
+	ticker.refresh()
 	# refresh chain data from APIs in multiple threads
 	a = pool.map(operator.methodcaller('refresh'), chains)
-	b = pool.map(operator.methodcaller('getPrice'), chains)
+	b = pool.map(operator.methodcaller('getPrice', ticker), chains)
 	## print debug info to screen
 	#os.system('clear')
 	#for i in chains:

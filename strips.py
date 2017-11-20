@@ -82,6 +82,8 @@ class Strips():
 
 	# indicate price change
 	def price(self, track, dayPriceChange):
+		# TODO: animate droplets in direction of change
+		# TODO: color layers for big changes!
 		dayPriceChange = float(dayPriceChange)
 		center = TRACK_LENGTH / 2
 		dotsPerPct = center / PRICE_CHANGE_RANGE

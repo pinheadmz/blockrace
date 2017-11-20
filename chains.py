@@ -13,15 +13,16 @@ def jsonPP(string):
 
 # Object to refresh prices for all chains
 class Ticker:
-	def __init__(self):
+	def __init__(self, timeout):
 		self.data = []
+		self.TO=timeout
 
 	def refresh(self):
 		try:
-			self.data = requests.get("https://api.coinmarketcap.com/v1/ticker").json()
+			self.data = requests.get("https://api.coinmarketcap.com/v1/ticker", timeout=self.TO).json()
 			return self.data
 		except:
-			print("Ticker Error:", sys.exc_info())
+			print "Ticker Error:", sys.exc_info()
 			return False
 
 	def getPrice(self, sym):
@@ -29,7 +30,6 @@ class Ticker:
 			if c["symbol"] == sym:
 				return (c["price_usd"], c["percent_change_1h"], c["percent_change_24h"])
 		return 0
-Ticker = Ticker()
 
 # Object to store details about blocks
 class Tip:
@@ -41,13 +41,14 @@ class Tip:
 
 # Object for each chain
 class Chain:
-	def __init__(self, name, sym, logo, color, interval):
+	def __init__(self, name, sym, logo, color, interval, timeout):
 		# general details for chain
 		self.name = name
 		self.sym = sym
 		self.logo = logo
 		self.color = color
 		self.interval = interval
+		self.TO = timeout
 		self.price = 0
 		self.hourPriceChange = 0
 		self.dayPriceChange = 0
@@ -76,94 +77,94 @@ class Chain:
 			return False
 
 	def display(self):
-		print('---')
-		print('Name:    ' + self.name)
-		#print('Symbol:  ' + self.sym)
-		#print('Price:   ' + str(self.price))
-		#print('Netstat: ' + ("*" * self.netstat))
-		print('History: ')
+		print '---'
+		print 'Name:    ' + self.name
+		#print 'Symbol:  ' + self.sym
+		#print 'Price:   ' + str(self.price)
+		#print 'Netstat: ' + ("*" * self.netstat)
+		print 'History: '
 		for tip in self.history:
 			print '%10.9s%8.7s%70.60s%10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
 
-	def getPrice(self):
-		(self.price, self.hourPriceChange, self.dayPriceChange) = Ticker.getPrice(self.sym)
+	def getPrice(self, ticker):
+		(self.price, self.hourPriceChange, self.dayPriceChange) = ticker.getPrice(self.sym)
 		return self.price
 
 	### different functions for each coin, delegated by __init__
 	def BTC_getTip(self):
 		try:
-			j = requests.get("https://blockchain.info/latestblock").json()
+			j = requests.get("https://blockchain.info/latestblock", timeout=self.TO).json()
 			tipHeight = str(j["height"])
 			tipHash = str(j["hash"])
 			tipNumTxs = str(len(j["txIndexes"]))
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print(self.name, "Error:", sys.exc_info())
+			print self.name, "Error:", sys.exc_info()
 			return False
 
 	def BCH_getTip(self):
 		try:
-			j = requests.get("https://api.blockchair.com/bitcoin-cash/blocks").json()
+			j = requests.get("https://api.blockchair.com/bitcoin-cash/blocks",  timeout=self.TO).json()
 			tipHeight = str(j["data"][0]["id"])
 			tipHash = str(j["data"][0]["hash"])
 			tipNumTxs = str(j["data"][0]["transaction_count"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print(self.name, "Error:", sys.exc_info())
+			print self.name, "Error:", sys.exc_info()
 			return False
 
 	def ETH_getTip(self):
 		try:
-			j = requests.get("https://etherchain.org/api/blocks/0/1").json()
+			j = requests.get("https://etherchain.org/api/blocks/0/1", timeout=self.TO).json()
 			tipHeight = str(j["data"][0]["number"])
 			tipHash = str(j["data"][0]["hash"])
 			tipNumTxs = str(j["data"][0]["tx_count"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print(self.name, "Error:", sys.exc_info())
+			print self.name, "Error:", sys.exc_info()
 			return False
 
 	def ETC_getTip(self):
 		try:
-			j = requests.get("https://api.gastracker.io/blocks/latest").json()
+			j = requests.get("https://api.gastracker.io/blocks/latest", timeout=self.TO).json()
 			tipHeight = str(j["items"][0]["height"])
 			tipHash = str(j["items"][0]["hash"])
-			tipNumTxs = str(j["items"][0]["transactions"])	
+			tipNumTxs = str(j["items"][0]["transactions"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print(self.name, "Error:", sys.exc_info())
+			print self.name, "Error:", sys.exc_info()
 			return False
 
 	def XMR_getTip(self):
 		try:
-			j = requests.get("https://xmrchain.net/api/transactions").json()
+			j = requests.get("https://xmrchain.net/api/transactions", timeout=self.TO).json()
 			tipHeight = str(j["data"]["blocks"][0]["height"])
 			tipHash = str(j["data"]["blocks"][0]["hash"])
 			tipNumTxs = str(len(j["data"]["blocks"][0]["txs"]))
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print(self.name, "Error:", sys.exc_info())
+			print self.name, "Error:", sys.exc_info()
 			return False
 
 	def LTC_getTip(self):
 		try:
-			j = requests.get("https://chain.so/api/v2/get_info/ltc").json()
+			j = requests.get("https://chain.so/api/v2/get_info/ltc", timeout=self.TO).json()
 			tipHeight = str(j["data"]["blocks"])
-			j = requests.get("https://chain.so/api/v2/get_block/ltc/" + tipHeight).json()
+			j = requests.get("https://chain.so/api/v2/get_block/ltc/" + tipHeight, timeout=10).json()
 			tipHash = str(j["data"]["blockhash"])
 			tipNumTxs = str(len(j["data"]["txs"]))
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print(self.name, "Error:", sys.exc_info())
+			print self.name, "Error:", sys.exc_info()
 			return False
 
 	def DCR_getTip(self):
 		try:
-			j = requests.get("https://mainnet.decred.org/api/blocks?limit=0").json()
+			j = requests.get("https://mainnet.decred.org/api/blocks?limit=0", timeout=self.TO).json()
 			tipHeight = str(j["blocks"][0]["height"])
 			tipHash = str(j["blocks"][0]["hash"])
 			tipNumTxs = str(j["blocks"][0]["txlength"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
-			print(self.name, "Error:", sys.exc_info())
+			print self.name, "Error:", sys.exc_info()
 			return False
