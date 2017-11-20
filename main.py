@@ -54,6 +54,8 @@ def cleanup():
 		G['strips'] = False
 atexit.register(cleanup)
 
+# TODO: check for internet and fail gracefully
+
 # WEB SERVER
 class HTTPHandler(BaseHTTPRequestHandler):
 	def _set_headers(self):
@@ -199,4 +201,5 @@ while True:
 	#os.system('clear')
 	#for i in chains:
 	#	i.display()
+	#index['BTC'].display()
 	time.sleep(API_REFRESH)

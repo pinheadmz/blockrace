@@ -80,15 +80,20 @@ class Strips():
 		for j in pattern:
 			self.strip.setPixelColor(track * TRACK_LENGTH + j, Color(*color))
 
-		# indicate price change
-		def price(self, track, dayPriceChange):
-			center = TRACK_LENGTH / 2
-			dotsPerPct = center / PRICE_CHANGE_RANGE
-			dotsOn = int((dotsPerPct * 100) / (dayPriceChange * 100))
-			color = Color(255,0,0) if dayPriceChange < 0 else Color(0,255,0)
-			for i in range (min(center+dotsOn, center), max(center+dotsOn, center)):
-				dot = (track * TRACK_LENGTH) + i
-				self.strip.setPixelColor(i, color)
+	# indicate price change
+	def price(self, track, dayPriceChange):
+		dayPriceChange = float(dayPriceChange)
+		center = TRACK_LENGTH / 2
+		dotsPerPct = center / PRICE_CHANGE_RANGE
+		# num LEDs to represent price, might be negative!
+		dotsOn = int(dotsPerPct * dayPriceChange)
+		color = Color(255,0,0) if dayPriceChange < 0 else Color(0,255,0)
+		# blank out strip first
+		self.stripe(track * TRACK_LENGTH, (track * TRACK_LENGTH) + TRACK_LENGTH, (0,0,0))
+		# draw the meter
+		for i in range (min(center+dotsOn, center), max(center+dotsOn, center)):
+			dot = (track * TRACK_LENGTH) + i
+			self.strip.setPixelColor(dot, color)
 
 '''
 # Define functions which animate LEDs in various ways.

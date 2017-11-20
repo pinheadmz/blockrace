@@ -78,9 +78,9 @@ class Chain:
 	def display(self):
 		print('---')
 		print('Name:    ' + self.name)
-		print('Symbol:  ' + self.sym)
-		print('Price:   ' + str(self.price))
-		print('Netstat: ' + ("*" * self.netstat))
+		#print('Symbol:  ' + self.sym)
+		#print('Price:   ' + str(self.price))
+		#print('Netstat: ' + ("*" * self.netstat))
 		print('History: ')
 		for tip in self.history:
 			print '%10.9s%8.7s%70.60s%10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
