@@ -116,9 +116,9 @@ class Chain:
 	def ETH_getTip(self):
 		try:
 			j = requests.get("https://etherchain.org/api/blocks/0/1", timeout=self.TO).json()
-			tipHeight = str(j["data"][0]["number"])
-			tipHash = str(j["data"][0]["hash"])
-			tipNumTxs = str(j["data"][0]["tx_count"])
+			tipHeight = str(j[0]["number"])
+			tipHash = str(j[0]["hash"])
+			tipNumTxs = str(j[0]["tx_count"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
 			print self.name, "Error:", sys.exc_info()

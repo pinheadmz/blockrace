@@ -5,11 +5,13 @@ from neopixel import *
 # constants
 NUM_TRACKS = 4
 TRACK_LENGTH = 75
-TARGET_BLOCK_COUNT = 8		# speed of blocks mode target based on coin interval
+# speed of blocks mode target based on coin interval
+TARGET_BLOCK_COUNT = 8
 BRIGHTNESS_NOTCH = 5
 MIN_BRIGHTNESS = 1
 MAX_BRIGHTNESS = 100
-PRICE_CHANGE_RANGE = 5 		# means 5% up or down
+# means 5% up or down
+PRICE_CHANGE_RANGE = 5
 
 # LED strip configuration:
 LED_COUNT      = 300      # Number of LED pixels.
@@ -69,7 +71,7 @@ class Strips():
 			timeSince = now - history[tip].time
 			pattern.append(timeSince / dotTime)
 			tip -= 1
-			if tip * -1 > len( history):
+			if tip * -1 > len(history):
 				break
 
 		# set background color then add bright dots

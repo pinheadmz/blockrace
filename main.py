@@ -20,19 +20,20 @@ from chains import *
 from tracks import *
 
 # CONSTANTS
+API_TIMEOUT = 10
 API_REFRESH = 3
 VIS_REFRESH = 0.001
 # 			index			name				sym		logo			color		interval	timeout
-index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0),	600,	API_REFRESH),
-			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash",	(55,200,0),		600,	API_REFRESH),
-			"ETH":	Chain("Ethereum",			"ETH",	"ethereum",		(0,153,200),	12,		API_REFRESH),
-			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic", (0,253,100),12	,	API_REFRESH),
-			"XMR":	Chain("Monero",				"XMR",	"monero",		(255,0,0),		120,	API_REFRESH),
-			"LTC":	Chain("Litecoin",			"LTC",	"litecoin",		(0,0,255),		150,	API_REFRESH),
-			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0),		300,	API_REFRESH)
+index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0),	600,	API_TIMEOUT),
+			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash",	(55,200,0),		600,	API_TIMEOUT),
+			"ETH":	Chain("Ethereum",			"ETH",	"ethereum",		(0,153,200),	12,		API_TIMEOUT),
+			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic", (0,253,100),12	,	API_TIMEOUT),
+			"XMR":	Chain("Monero",				"XMR",	"monero",		(255,0,0),		120,	API_TIMEOUT),
+			"LTC":	Chain("Litecoin",			"LTC",	"litecoin",		(0,0,255),		150,	API_TIMEOUT),
+			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0),		300,	API_TIMEOUT)
 		}
 chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
-ticker = Ticker(API_REFRESH)
+ticker = Ticker(API_TIMEOUT)
 G = {}
 G['screens'] = Screens() if SCREENS_ON else False
 G['strips'] = Strips() if STRIPS_ON else False
