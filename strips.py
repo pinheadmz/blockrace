@@ -10,8 +10,9 @@ TARGET_BLOCK_COUNT = 8
 BRIGHTNESS_NOTCH = 5
 MIN_BRIGHTNESS = 1
 MAX_BRIGHTNESS = 100
-# means 5% up or down
+# means % up or down that fills half strip from center out
 PRICE_CHANGE_RANGE = 5
+NUM_DROPLETS = 4
 
 # LED strip configuration:
 LED_COUNT      = 300      # Number of LED pixels.
@@ -31,8 +32,12 @@ class Strips():
 		# Intialize the library (must be called once before other functions).
 		self.strip.begin()
 		self.allOff()
+		# init variables for frame iteration
+		# for twinkle
 		self.randBrightness = [random.randint(MIN_BRIGHTNESS, MAX_BRIGHTNESS) for x in range(TRACK_LENGTH * NUM_TRACKS)]
 		self.brightnessDirection = [random.choice([-1,1]) for x in range(TRACK_LENGTH * NUM_TRACKS)]
+		# for price
+		self.dropletPos = 0
 
 	# all lights off
 	def allOff(self):
@@ -98,6 +103,14 @@ class Strips():
 		for i in range (min(center+dotsOn, center), max(center+dotsOn, center)):
 			dot = (track * TRACK_LENGTH) + i
 			self.strip.setPixelColor(dot, color)
+		# draw the droplets
+		dropSpace = center / NUM_DROPLETS
+		for j in range(NUM_DROPLETS):
+			direction = -1 if dayPriceChange < 0 else 1
+			dropDotPos = (track * TRACK_LENGTH) + center + (direction * ((j * dropSpace) + self.dropletPos))
+			newColor = color if self.strip.getPixelColor(dot) == Color(0,0,0) else Color(0,0,0)
+			self.strip.setPixelColor(dropDotPos, newColor)
+		self.dropletPos = (self.dropletPos + 1) % dropSpace
 
 '''
 # Define functions which animate LEDs in various ways.
