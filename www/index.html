@@ -257,10 +257,15 @@
 		else
 			gain = "<span style='color:red'> ("
 		// insert the HTML into the UI
+		if (data['price'] < 1)
+			fmtPrice = smallMoney.format(data['price']);
+		else
+			fmtPrice = money.format(data['price']);
+		
 		$('.chainInfo[data-track=' + track + '] .infoContainer').html(	'<br>' +
 																		'<div class="chainInfoTop">' +
 																		'<span class="chainName">' + data['name'] + '</span>' +
-																		'<span class="chainPrice">' + money.format(data['price']) + gain + data['dayPriceChange'] +'%)</span></span><br>' +
+																		'<span class="chainPrice">' + fmtPrice + gain + data['dayPriceChange'] +'%)</span></span><br>' +
 																		'</div>' +
 																		'<table class="infoTable"><tr>' +
 																		'<td>Latest block: ' + data['height'] + '</td>' +
@@ -287,6 +292,11 @@
 		style: 'currency',
 		currency: 'USD',
 		minimumFractionDigits: 2
+	});
+	var smallMoney = new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
+		minimumFractionDigits: 4
 	});
 	
 	//  ** MAIN LOOP **
