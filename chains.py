@@ -168,3 +168,20 @@ class Chain:
 		except:
 			print self.name, "Error:", sys.exc_info()
 			return False
+
+	def DOGE_getTip(self):
+		try:
+			j = requests.get("https://chain.so/api/v2/get_info/DOGE", timeout=self.TO).json()
+			tipHeight = str(j["data"]["blocks"])
+			j = requests.get("https://chain.so/api/v2/get_block/DOGE/" + tipHeight, timeout=self.TO).json()
+			tipHash = str(j["data"]["blockhash"])
+			tipNumTxs = str(len(j["data"]["blockhash"]))
+			return Tip(tipHeight, tipHash, tipNumTxs)
+		except:
+			print self.name, "Error:", sys.exc_info()
+			return False
+
+
+
+
+

@@ -23,24 +23,27 @@ from tracks import *
 API_TIMEOUT = 10
 API_REFRESH = 3
 VIS_REFRESH = 0.001
+# OBJECTS
 # 			index			name				sym		logo			color		interval	timeout
 index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0),	600,	API_TIMEOUT),
 			"BCH":	Chain("Bitcoin Cash",		"BCH",	"bitcoin-cash",	(55,200,0),		600,	API_TIMEOUT),
 			"ETH":	Chain("Ethereum",			"ETH",	"ethereum",		(0,153,200),	12,		API_TIMEOUT),
-			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic", (0,253,100),12	,	API_TIMEOUT),
+			"ETC":	Chain("Ethereum Classic",	"ETC",	"ethereum-classic", (0,253,100),12,		API_TIMEOUT),
 			"XMR":	Chain("Monero",				"XMR",	"monero",		(255,0,0),		120,	API_TIMEOUT),
 			"LTC":	Chain("Litecoin",			"LTC",	"litecoin",		(0,0,255),		150,	API_TIMEOUT),
-			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0),		300,	API_TIMEOUT)
+			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0),		300,	API_TIMEOUT),
+			"DOGE":	Chain("Dogecoin",			"DOGE",	"dogecoin",		(85,74,38),		60,		API_TIMEOUT)
 		}
-chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"]]
+chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"], index["DOGE"]]
 ticker = Ticker(API_TIMEOUT)
+# GLOBALS
 G = {}
 G['screens'] = Screens() if SCREENS_ON else False
 G['strips'] = Strips() if STRIPS_ON else False
 tracks = [Track(0, G), Track(1, G), Track(2, G), Track(3, G)]
+RUN_THREADS = True
 
 # cleanup at shutdown
-RUN_THREADS = True
 def cleanup():
 	# switch off flag to kill threads
 	global RUN_THREADS, G
