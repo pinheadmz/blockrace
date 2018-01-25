@@ -32,9 +32,10 @@ index = {	"BTC":	Chain("Bitcoin",			"BTC",	"bitcoin",		(255,153,0),	600,	API_TIM
 			"XMR":	Chain("Monero",				"XMR",	"monero",		(255,0,0),		120,	API_TIMEOUT),
 			"LTC":	Chain("Litecoin",			"LTC",	"litecoin",		(0,0,255),		150,	API_TIMEOUT),
 			"DCR":	Chain("Decred",				"DCR",	"decred",		(0,255,0),		300,	API_TIMEOUT),
-			"DOGE":	Chain("Dogecoin",			"DOGE",	"dogecoin",		(85,74,38),		60,		API_TIMEOUT)
+			"DOGE":	Chain("Dogecoin",			"DOGE",	"dogecoin",		(85,74,38),		60,		API_TIMEOUT),
+			"DASH":	Chain("Dash",				"DASH",	"dash",			(28, 117, 188),	270,	API_TIMEOUT)
 		}
-chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"], index["DOGE"]]
+chains = [index["BTC"], index["BCH"], index["ETH"], index["ETC"], index["XMR"], index["LTC"], index["DCR"], index["DOGE"], index["DASH"]]
 ticker = Ticker(API_TIMEOUT)
 # GLOBALS
 G = {}

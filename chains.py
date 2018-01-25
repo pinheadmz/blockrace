@@ -181,6 +181,18 @@ class Chain:
 			print self.name, "Error:", sys.exc_info()
 			return False
 
+	def DASH_getTip(self):
+		try:
+			j = requests.get("https://api.blockcypher.com/v1/dash/main", timeout=self.TO).json()
+			tipHeight = str(j["height"])
+			tipHash = str(j["hash"])
+			j = requests.get("https://api.blockcypher.com/v1/dash/main/blocks/" + tipHash, timeout=self.TO).json()
+			tipNumTxs = str(len(j["txids"]))
+			return Tip(tipHeight, tipHash, tipNumTxs)
+		except:
+			print self.name, "Error:", sys.exc_info()
+			return False
+
 
 
 
