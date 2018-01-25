@@ -193,6 +193,18 @@ class Chain:
 			print self.name, "Error:", sys.exc_info()
 			return False
 
+	def ZEC_getTip(self):
+		try:
+			j = requests.get("https://api.zcha.in/v2/mainnet/blocks?sort=height&direction=descending&limit=1&offset=0", timeout=self.TO).json()
+			j = j[0]
+			tipHeight = str(j["height"])
+			tipHash = str(j["hash"])
+			tipNumTxs = str(j["transactions"])
+			return Tip(tipHeight, tipHash, tipNumTxs)
+		except:
+			print self.name, "Error:", sys.exc_info()
+			return False
+
 
 
 
