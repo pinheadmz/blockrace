@@ -12,7 +12,7 @@ class Track():
 
 	def setVis(self, vis):
 		self.vis = vis
-	
+
 	def didScreenArgsChange(self, args):
 		oldArgs = self.screenArgs
 		self.screenArgs = args

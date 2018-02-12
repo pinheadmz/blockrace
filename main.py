@@ -8,8 +8,8 @@ import thread
 import atexit
 
 # configure hardware
-SCREENS_ON = False
-STRIPS_ON = False
+SCREENS_ON = True
+STRIPS_ON = True
 
 # import other blockrace modules
 if SCREENS_ON:

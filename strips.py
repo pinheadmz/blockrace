@@ -4,7 +4,7 @@ from neopixel import *
 
 # constants
 NUM_TRACKS = 4
-TRACK_LENGTH = 75
+TRACK_LENGTH = 60
 # speed of blocks mode target based on coin interval
 TARGET_BLOCK_COUNT = 8
 BRIGHTNESS_NOTCH = 5
@@ -38,7 +38,20 @@ class Strips():
 		self.brightnessDirection = [random.choice([-1,1]) for x in range(TRACK_LENGTH * NUM_TRACKS)]
 		# for price
 		self.dropletPos = 0
-
+		self.dropletSlowdownFactor = (25, 25)
+	
+	# return range for leftmost and rightmost pixels for this track bc strips zig zag upside down
+	def trackRange(self, track):
+		track = NUM_TRACKS - 1 - track 
+		direction = 1 if track in (1, 3) else -1
+		if direction == 1:
+			left = track * TRACK_LENGTH
+			right = track * TRACK_LENGTH + TRACK_LENGTH
+		if direction == -1:
+			right = track * TRACK_LENGTH - 1
+			left = track * TRACK_LENGTH + TRACK_LENGTH - 1
+		return (left, right, direction)
+	
 	# all lights off
 	def allOff(self):
 		for i in range(self.strip.numPixels()):
@@ -52,7 +65,8 @@ class Strips():
 
 	# set track to one color with random brightnesses for twinkle effect
 	def twinkle(self, track, color):
-		for i in range (track * TRACK_LENGTH, track * TRACK_LENGTH + TRACK_LENGTH):
+		left, right, direction = self.trackRange(track)
+		for i in range (left, right, direction):
 			# modulate brightness slowly between frames
 			if self.randBrightness[i] >= MAX_BRIGHTNESS - BRIGHTNESS_NOTCH:
 				self.brightnessDirection[i] = -1
@@ -80,13 +94,15 @@ class Strips():
 				break
 
 		# set background color then add bright dots
-		for i in range (track * TRACK_LENGTH, track * TRACK_LENGTH + TRACK_LENGTH):
+		left, right, direction = self.trackRange(track)
+		for i in range (left, right, direction):
 			brightness = 0.05
 			bgColor = tuple(int(x * brightness) for x in color)
 			self.strip.setPixelColor(i, Color(*bgColor))
 		for j in pattern:
-			self.strip.setPixelColor(track * TRACK_LENGTH + j, Color(*color))
+				self.strip.setPixelColor(left + (j * direction), Color(*color))
 
+				
 	# indicate price change
 	def price(self, track, dayPriceChange):
 		# TODO: animate droplets in direction of change
@@ -98,19 +114,26 @@ class Strips():
 		dotsOn = int(dotsPerPct * dayPriceChange)
 		color = Color(255,0,0) if dayPriceChange < 0 else Color(0,255,0)
 		# blank out strip first
-		self.stripe(track * TRACK_LENGTH, (track * TRACK_LENGTH) + TRACK_LENGTH, (0,0,0))
+		left, right, direction = self.trackRange(track)
+		for i in range(left, right, direction):
+			self.strip.setPixelColor(i, Color(0,0,0))
 		# draw the meter
 		for i in range (min(center+dotsOn, center), max(center+dotsOn, center)):
-			dot = (track * TRACK_LENGTH) + i
+			dot = left + (i * direction)
 			self.strip.setPixelColor(dot, color)
 		# draw the droplets
-		dropSpace = center / NUM_DROPLETS
-		for j in range(NUM_DROPLETS):
-			direction = -1 if dayPriceChange < 0 else 1
-			dropDotPos = (track * TRACK_LENGTH) + center + (direction * ((j * dropSpace) + self.dropletPos))
-			newColor = color if self.strip.getPixelColor(dot) == Color(0,0,0) else Color(0,0,0)
-			self.strip.setPixelColor(dropDotPos, newColor)
-		self.dropletPos = (self.dropletPos + 1) % dropSpace
+		priceDir = -1 if dayPriceChange < 0 else 1
+		oneMoreOffset = -1 if dayPriceChange < 0 else 0
+		droplet = left + ((center + oneMoreOffset) * direction) + (self.dropletPos * direction * priceDir)
+		newColor = color if self.strip.getPixelColor(droplet) == Color(0,0,0) else Color(0,0,0)
+		self.strip.setPixelColor(droplet, newColor)
+		# calculate next droplet position
+		factor, count = self.dropletSlowdownFactor
+		if count == 0:
+			self.dropletPos = (self.dropletPos + 1) % center
+		count = (count - 1) % factor
+		self.dropletSlowdownFactor = (factor, count)
+
 
 '''
 # Define functions which animate LEDs in various ways.
