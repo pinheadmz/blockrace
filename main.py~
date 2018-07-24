@@ -1,13 +1,12 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
-import os, sys
+from os import curdir, sep
 import json
 import operator
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
 import atexit
-import subprocess
-curdir = os.path.dirname(sys.argv[0])
+import webbrowser
 
 # configure hardware
 SCREENS_ON = True
@@ -121,7 +120,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 
 			if sendReply == True:
 				#Open the static file requested and send it
-				f = open(curdir + '/www/' + self.path)
+				f = open(curdir + sep + "www" + sep + self.path) 
 				self.send_response(200)
 				self.send_header('Content-type',mimetype)
 				self.end_headers()
@@ -130,7 +129,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 			else:
 				self.send_error(404,'File Type Unknown: %s' % self.path)
 		except:
-			self.send_error(404,'File Not Found: %s' % curdir + '/www/' + self.path)
+			self.send_error(404,'File Not Found: %s' % self.path)
 		return
 
 	def do_POST(self):
@@ -178,8 +177,7 @@ thread.start_new_thread(startServer, ())
 
 # open the UI in chrome
 print "Opening Chrome..."
-#os.system('su -c "/usr/bin/chromium-browser --kiosk http://localhost:8080" - pi')
-#subprocess.Popen(['/usr/bin/chromium-browser', '--kiosk', 'http://localhost:8080'])
+webbrowser.get('/usr/bin/chromium-browser').open('http://localhost:8080')
 
 # refresh screens and strips for each track in background thread
 def animate():
