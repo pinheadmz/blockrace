@@ -53,6 +53,7 @@ class Chain:
 		self.hourPriceChange = 0
 		self.dayPriceChange = 0
 		self.netstat = 12
+		self.txrate = 0
 		# store history of chain tips
 		self.history = [Tip(0,0,0)]
 		# delegate API function
@@ -69,9 +70,20 @@ class Chain:
 			# clear init tip
 			if oldTip.height == 0:
 				self.history.pop(-1)
+			# add new tip to history
 			self.history.append(newTip)
 			if len(self.history) > MAX_BLOCK_HISTORY:
 				self.history.pop(0)
+			# calculate new tx rate
+			if len(self.history) == 1:
+				timeElapsed = self.interval
+				txTotal = int(self.history[0].numTxs)
+			else:
+				timeElapsed = self.history[-1].time - self.history[0].time
+				txTotal = 0
+				for tip in self.history[1:]:
+					txTotal += int(tip.numTxs)
+			self.txrate = float(txTotal)/timeElapsed
 			return newTip
 		else:
 			return False
@@ -82,9 +94,10 @@ class Chain:
 		#print 'Symbol:  ' + self.sym
 		#print 'Price:   ' + str(self.price)
 		#print 'Netstat: ' + ("*" * self.netstat)
+		print 'TX rate: ' + str(self.txrate)
 		print 'History: '
 		for tip in self.history:
-			print '%10.9s%8.7s%70.60s%10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
+			print '%12.10s%8.7s%70.60s%10.8s' % (str(tip.time), str(tip.height), str(tip.hash), str(tip.numTxs))
 
 	def getPrice(self, ticker):
 		(self.price, self.hourPriceChange, self.dayPriceChange) = ticker.getPrice(self.sym)

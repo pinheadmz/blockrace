@@ -11,8 +11,9 @@ BRIGHTNESS_NOTCH = 5
 MIN_BRIGHTNESS = 1
 MAX_BRIGHTNESS = 100
 # means % up or down that fills half strip from center out
-PRICE_CHANGE_RANGE = 5
-NUM_DROPLETS = 4
+PRICE_CHANGE_RANGE = 8
+# length of time per strip for tx race
+TX_TIME = 1
 
 # LED strip configuration:
 LED_COUNT      = 300      # Number of LED pixels.
@@ -37,12 +38,14 @@ class Strips():
 		self.randBrightness = [random.randint(MIN_BRIGHTNESS, MAX_BRIGHTNESS) for x in range(TRACK_LENGTH * NUM_TRACKS)]
 		self.brightnessDirection = [random.choice([-1,1]) for x in range(TRACK_LENGTH * NUM_TRACKS)]
 		# for price
-		self.dropletPos = 0
-		self.dropletSlowdownFactor = (25, 25)
-	
+		self.dropletPos = [0, 0, 0, 0]
+		self.dropletSlowdownFactor = [(10, 10), (10, 10), (10, 10), (10, 10)]
+		# for tx rate
+		self.lastTime = time.time()
+
 	# return range for leftmost and rightmost pixels for this track bc strips zig zag upside down
 	def trackRange(self, track):
-		track = NUM_TRACKS - 1 - track 
+		track = NUM_TRACKS - 1 - track
 		direction = 1 if track in (1, 3) else -1
 		if direction == 1:
 			left = track * TRACK_LENGTH
@@ -51,7 +54,7 @@ class Strips():
 			right = track * TRACK_LENGTH - 1
 			left = track * TRACK_LENGTH + TRACK_LENGTH - 1
 		return (left, right, direction)
-	
+
 	# all lights off
 	def allOff(self):
 		for i in range(self.strip.numPixels()):
@@ -102,7 +105,7 @@ class Strips():
 		for j in pattern:
 				self.strip.setPixelColor(left + (j * direction), Color(*color))
 
-				
+
 	# indicate price change
 	def price(self, track, dayPriceChange):
 		# TODO: animate droplets in direction of change
@@ -124,15 +127,32 @@ class Strips():
 		# draw the droplets
 		priceDir = -1 if dayPriceChange < 0 else 1
 		oneMoreOffset = -1 if dayPriceChange < 0 else 0
-		droplet = left + ((center + oneMoreOffset) * direction) + (self.dropletPos * direction * priceDir)
+		droplet = left + ((center + oneMoreOffset) * direction) + (self.dropletPos[track] * direction * priceDir)
 		newColor = color if self.strip.getPixelColor(droplet) == Color(0,0,0) else Color(0,0,0)
 		self.strip.setPixelColor(droplet, newColor)
 		# calculate next droplet position
-		factor, count = self.dropletSlowdownFactor
+		factor, count = self.dropletSlowdownFactor[track]
 		if count == 0:
-			self.dropletPos = (self.dropletPos + 1) % center
+			self.dropletPos[track] = (self.dropletPos[track] + 1) % center
 		count = (count - 1) % factor
-		self.dropletSlowdownFactor = (factor, count)
+		self.dropletSlowdownFactor[track] = (factor, count)
+
+	def txs(self, track, txrate):
+		if txrate == 0:
+			return
+		timePerLED = float(TX_TIME) / TRACK_LENGTH
+		elapsed = time.time() - self.lastTime
+		if elapsed > 10:
+			self.lastTime = time.time()
+		numTXDots = txrate * TX_TIME
+		wavelength= int(TRACK_LENGTH / numTXDots)
+
+		left, right, direction = self.trackRange(track)
+		offset = int(elapsed / timePerLED) % wavelength
+		for i in range(left, right, direction):
+			self.strip.setPixelColor(i, Color(0,0,0))
+		for i in xrange(0, TRACK_LENGTH - offset, max(1, wavelength)):
+			self.strip.setPixelColor(left + ((offset + i) * direction), Color(100, 100, 100))
 
 
 '''

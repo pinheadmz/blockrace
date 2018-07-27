@@ -1,17 +1,20 @@
+thisDir = '/home/pi/blockrace/'
+import os, sys
+os.chdir(thisDir)
+
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
-import os, sys
 import json
 import operator
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
 import atexit
 import subprocess
-curdir = os.path.dirname(sys.argv[0])
 
 # configure hardware
 SCREENS_ON = True
 STRIPS_ON = True
+BROWSER_LAUNCH = True
 
 # import other blockrace modules
 if SCREENS_ON:
@@ -121,7 +124,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 
 			if sendReply == True:
 				#Open the static file requested and send it
-				f = open(curdir + '/www/' + self.path)
+				f = open(thisDir + 'www/' + self.path)
 				self.send_response(200)
 				self.send_header('Content-type',mimetype)
 				self.end_headers()
@@ -130,7 +133,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 			else:
 				self.send_error(404,'File Type Unknown: %s' % self.path)
 		except:
-			self.send_error(404,'File Not Found: %s' % curdir + '/www/' + self.path)
+			self.send_error(404,'File Not Found: %s' % thisDir + 'www/' + self.path)
 		return
 
 	def do_POST(self):
@@ -177,9 +180,9 @@ def startServer(server_class=HTTPServer, handler_class=HTTPHandler, port=8080):
 thread.start_new_thread(startServer, ())
 
 # open the UI in chrome
-print "Opening Chrome..."
-#os.system('su -c "/usr/bin/chromium-browser --kiosk http://localhost:8080" - pi')
-#subprocess.Popen(['/usr/bin/chromium-browser', '--kiosk', 'http://localhost:8080'])
+if BROWSER_LAUNCH:
+	print "Opening Chrome..."
+	os.system('sudo -u pi /usr/bin/chromium-browser --kiosk http://localhost:8080 &')
 
 # refresh screens and strips for each track in background thread
 def animate():
@@ -203,7 +206,7 @@ thread.start_new_thread(animate, ())
 
 
 # API refresh loop
-pool = ThreadPool(8)
+pool = ThreadPool(10)
 tick = 0
 while True:
 	# refresh price data

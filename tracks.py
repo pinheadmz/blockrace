@@ -42,8 +42,8 @@ class Track():
 				if self.didScreenArgsChange(args):
 					self.screens.showLogoWithText(*args)
 			if self.vis == 'txs':
-				numTxs = self.chain.history[-1].numTxs
-				text = self.chain.sym + ": " + numTxs
+				txrate = self.chain.txrate
+				text = self.chain.sym + ": " + '%.2f'%(txrate) + " tx/s"
 				args = (self.id, self.chain.logo, text, (255, 255, 255))
 				if self.didScreenArgsChange(args):
 					self.screens.showLogoWithText(*args)
@@ -58,4 +58,5 @@ class Track():
 				self.strips.price(self.id, self.chain.dayPriceChange)
 				return
 			if self.vis == 'txs':
+				self.strips.txs(self.id, self.chain.txrate)
 				return
