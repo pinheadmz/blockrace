@@ -142,13 +142,11 @@ class Strips():
 			return
 		timePerLED = float(TX_TIME) / TRACK_LENGTH
 		elapsed = time.time() - self.lastTime
-		if elapsed > 10:
-			self.lastTime = time.time()
 		numTXDots = txrate * TX_TIME
 		wavelength= int(TRACK_LENGTH / numTXDots)
 
 		left, right, direction = self.trackRange(track)
-		offset = int(elapsed / timePerLED) % wavelength
+		offset = int((elapsed / timePerLED) % wavelength)
 		for i in range(left, right, direction):
 			self.strip.setPixelColor(i, Color(0,0,0))
 		for i in xrange(0, TRACK_LENGTH - offset, max(1, wavelength)):

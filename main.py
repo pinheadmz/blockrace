@@ -143,6 +143,9 @@ class HTTPHandler(BaseHTTPRequestHandler):
 
 		# user requesting info for a chain to display on the touchscreen
 		if self.path == "/getChainInfo":
+			if data['sym'] == 'quit':
+				cleanup()
+				os.system('sudo killall python')
 			chosenChain = index[data['sym']]
 			# respond to browser
 			self.wfile.write(json.dumps({	"name": chosenChain.name,

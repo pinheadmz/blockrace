@@ -128,6 +128,14 @@
 			font-size: 20px;
 		}
 		
+		.quit{
+			position: fixed;
+			z-index: 99999;
+			height: 10px;
+			width: 10px;
+			right: 0px;
+		}
+		
 		@keyframes pulse {
 			0% { background-color: #ffff99; }
 			100% { background-color: white; }
@@ -152,6 +160,7 @@
 	</div>
 	<div class="panel chooser">
 	</div>
+	<div class="quit"></div>
 </body>
 <script src="chainsIndex.js"></script>
 <script>
@@ -207,8 +216,8 @@
 		$(this).append(	'<div class="chooseVis">' +
 						'<div class="visChoice" data-vis="flag"><span>Flag</span></div>' +
 						'<div class="visChoice" data-vis="blocks"><span>Blocks</span></div>' +
-						'<div class="visChoice" data-vis="price"><span>Price</span></div>' +
 						'<div class="visChoice" data-vis="txs"><span>Txs</span></div>' +
+						'<div class="visChoice" data-vis="price"><span>Price</span></div>' +
 						'</div>');	
 	});
 	// select LED strip visualizer for track
@@ -226,6 +235,13 @@
 			data: JSON.stringify({track: track, visChoice: visChoice}),
 			success: function(ret){console.log(ret);}
 		});
+	});
+	// quit
+	$('.quit').click(function(){
+		if (confirm("Quit?")){
+			getChainInfoAndUpdateDisplay(0, 'quit');
+			setTimeout( function(){window.close();}, 1000);
+		}
 	});
 	
 	// FUNCTIONALITY
