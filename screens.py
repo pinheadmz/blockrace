@@ -43,7 +43,8 @@ class Screens():
 		# initialize blank canvas then add logo from file
 		canvas = Image.new('RGB', (WIDTH, HEIGHT))
 		logo = Image.open(IMG_DIR + logo + '.jpg')
-		logo = PIL.ImageOps.invert(logo)
+		r, g, b = logo.split()
+		logo = Image.merge("RGB", [b, g, r])
 		canvas.paste(logo, (0,0))
 		# calculate best-fit font size (by width) and add text
 		size = 1
