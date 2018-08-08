@@ -1,4 +1,4 @@
-thisDir = '/Volumes/untitled/blockrace/blockrace/'
+thisDir = '/home/pi/blockrace/'
 import os, sys
 os.chdir(thisDir)
 
