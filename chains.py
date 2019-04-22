@@ -93,7 +93,7 @@ class Chain:
 		print 'Name:    ' + self.name
 		#print 'Symbol:  ' + self.sym
 		#print 'Price:   ' + str(self.price)
-		#print 'Netstat: ' + ("*" * self.netstat)
+		print 'Netstat: ' + ("*" * self.netstat)
 		print 'TX rate: ' + str(self.txrate)
 		print 'History: '
 		for tip in self.history:
@@ -128,10 +128,13 @@ class Chain:
 
 	def ETH_getTip(self):
 		try:
-			j = requests.get("https://etherchain.org/api/blocks/0/1", timeout=self.TO).json()
-			tipHeight = str(j[0]["number"])
-			tipHash = str(j[0]["hash"])
-			tipNumTxs = str(j[0]["tx_count"])
+			j = requests.get("https://etherchain.org/blocks/data", timeout=self.TO).json()
+			j = j["data"][0]
+			tipHeight = str(j["number"])
+			tipHash = str(j["hash"])
+			tipHeight = tipHeight.split('>')[1].split('<')[0]
+			tipHash = "0x" + tipHash.split('block/')[1].split("'>")[0]
+			tipNumTxs = str(j["tx_count"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
 			print self.name, "Error:", sys.exc_info()
@@ -161,11 +164,10 @@ class Chain:
 
 	def LTC_getTip(self):
 		try:
-			j = requests.get("https://chain.so/api/v2/get_info/ltc", timeout=self.TO).json()
-			tipHeight = str(j["data"]["blocks"])
-			j = requests.get("https://chain.so/api/v2/get_block/ltc/" + tipHeight, timeout=10).json()
-			tipHash = str(j["data"]["blockhash"])
-			tipNumTxs = str(len(j["data"]["txs"]))
+			j = requests.get("https://api.blockchair.com/litecoin/blocks",  timeout=self.TO).json()
+			tipHeight = str(j["data"][0]["id"])
+			tipHash = str(j["data"][0]["hash"])
+			tipNumTxs = str(j["data"][0]["transaction_count"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
 			print self.name, "Error:", sys.exc_info()
@@ -184,11 +186,10 @@ class Chain:
 
 	def DOGE_getTip(self):
 		try:
-			j = requests.get("https://chain.so/api/v2/get_info/DOGE", timeout=self.TO).json()
-			tipHeight = str(j["data"]["blocks"])
-			j = requests.get("https://chain.so/api/v2/get_block/DOGE/" + tipHeight, timeout=self.TO).json()
-			tipHash = str(j["data"]["blockhash"])
-			tipNumTxs = str(len(j["data"]["blockhash"]))
+			j = requests.get("https://api.blockchair.com/dogecoin/blocks",  timeout=self.TO).json()
+			tipHeight = str(j["data"][0]["id"])
+			tipHash = str(j["data"][0]["hash"])
+			tipNumTxs = str(j["data"][0]["transaction_count"])
 			return Tip(tipHeight, tipHash, tipNumTxs)
 		except:
 			print self.name, "Error:", sys.exc_info()
